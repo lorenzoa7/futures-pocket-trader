@@ -1,4 +1,4 @@
-import { siteRoutes } from '@/config/routes'
+import { siteRoutes } from '@/config/site'
 import { redirect } from 'next/navigation'
 
 export default function Home() {

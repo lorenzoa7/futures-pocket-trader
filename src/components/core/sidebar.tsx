@@ -2,6 +2,7 @@
 
 import Logo from '@/assets/logo.png'
 import { navConfig } from '@/config/nav'
+import { myGithubProfileUrl, projectRepositoryUrl } from '@/config/site'
 import { cn } from '@/lib/utils'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
@@ -45,11 +46,12 @@ export function Sidebar() {
         <div className="flex items-center gap-2">
           <span>built with 🧡 by</span>
           <Link
-            href={'#'}
+            href={myGithubProfileUrl}
             className={cn(
               buttonVariants({ size: 'none', variant: 'linkSecondary' }),
               'text-base',
             )}
+            target="_blank"
           >
             lorenzo aceti
           </Link>
@@ -57,11 +59,12 @@ export function Sidebar() {
         <div className="flex items-center gap-2">
           <span>Check it on</span>
           <Link
-            href={'#'}
+            href={projectRepositoryUrl}
             className={cn(
               buttonVariants({ size: 'none', variant: 'linkSecondary' }),
               'flex items-center gap-2 text-base',
             )}
+            target="_blank"
           >
             GitHub <GithubIcon />
           </Link>

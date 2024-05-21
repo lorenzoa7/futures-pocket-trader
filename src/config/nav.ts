@@ -1,5 +1,5 @@
 import { BookTextIcon, PlusCircleIcon, Settings2Icon } from 'lucide-react'
-import { SiteRoutes, siteRoutes } from './routes'
+import { SiteRoutes, siteRoutes } from './site'
 
 export type NavItem = {
   title: string
@@ -24,9 +24,3 @@ export const navConfig: NavItem[] = [
     icon: Settings2Icon,
   },
 ]
-
-export const navTitles = {
-  '/account': 'Account',
-  '/create-order': 'Create order',
-  '/information': 'Information',
-} satisfies Record<SiteRoutes[keyof SiteRoutes], string>
