@@ -1,23 +1,27 @@
-import { BadgeCentIcon, BookTextIcon, UserIcon } from 'lucide-react'
+import { BookTextIcon, PlusCircleIcon, Settings2Icon } from 'lucide-react'
 import { SiteRoutes, siteRoutes } from './routes'
 
 export type NavItem = {
+  title: string
   href: SiteRoutes[keyof SiteRoutes]
   icon: React.ElementType
 }
 
 export const navConfig: NavItem[] = [
   {
-    href: siteRoutes.account,
-    icon: UserIcon,
-  },
-  {
+    title: 'Create order',
     href: siteRoutes.createOrder,
-    icon: BadgeCentIcon,
+    icon: PlusCircleIcon,
   },
   {
+    title: 'Information',
     href: siteRoutes.information,
     icon: BookTextIcon,
+  },
+  {
+    title: 'Settings',
+    href: siteRoutes.account,
+    icon: Settings2Icon,
   },
 ]
 

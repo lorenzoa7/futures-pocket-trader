@@ -1,4 +1,4 @@
-import { Header } from '@/components/core/header'
+import { Sidebar } from '@/components/core/sidebar'
 import { fira } from '@/lib/fonts'
 import type { Metadata } from 'next'
 import './globals.css'
@@ -17,10 +17,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`font-fira ${fira.variable} flex h-screen flex-col bg-slate-900 p-10 text-slate-50 antialiased`}
+        className={`font-fira ${fira.variable} bg-slate-900 text-slate-50 antialiased`}
       >
-        <Header />
-        <div className="flex flex-1 flex-col">{children}</div>
+        <div className="grid h-screen grid-cols-[18rem_1fr]">
+          <Sidebar />
+          <main className="flex flex-1 flex-col">{children}</main>
+        </div>
       </body>
     </html>
   )

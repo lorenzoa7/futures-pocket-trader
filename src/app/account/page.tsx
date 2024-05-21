@@ -1,7 +1,9 @@
+import { Section } from '@/components/core/section'
+
 export default function Account() {
   return (
-    <>
-      <div>Hello World</div>
-    </>
+    <Section title="Account">
+      <span>Hello World</span>
+    </Section>
   )
 }
