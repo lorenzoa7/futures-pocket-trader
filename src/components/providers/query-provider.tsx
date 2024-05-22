@@ -18,11 +18,13 @@ export function QueryProvider({ children }: PropsWithChildren) {
       new QueryClient({
         queryCache: new QueryCache({
           onError: (error) => {
-            toast.error(
-              error.message.length > 0
-                ? error.message
-                : 'Something went wrong! Try refreshing the application.',
-            )
+            const [errorTitle, errorMessage] = error.message.split('|')
+            toast.error(errorTitle, {
+              description:
+                errorMessage && errorMessage.length > 0
+                  ? errorMessage
+                  : undefined,
+            })
           },
         }),
         defaultOptions: {

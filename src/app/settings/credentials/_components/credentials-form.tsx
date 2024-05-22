@@ -17,7 +17,7 @@ import {
 } from '@/schemas/credentials-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SaveIcon } from 'lucide-react'
-import { useLayoutEffect } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -43,7 +43,7 @@ export function CredentialsForm() {
     toast.success('Credentials saved!')
   }
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     reset({ apiKey, secretKey })
   }, [apiKey, secretKey, reset])
 

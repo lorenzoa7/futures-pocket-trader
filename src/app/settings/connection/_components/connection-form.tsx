@@ -15,7 +15,7 @@ import { useAccountStore } from '@/hooks/store/use-account-store'
 import { ConnectionSchema, connectionSchema } from '@/schemas/connection-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SaveIcon } from 'lucide-react'
-import { useLayoutEffect } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -39,7 +39,7 @@ export function ConnectionForm() {
     toast.success('Connection preferences saved!')
   }
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     reset({ isTestnetAccount })
   }, [isTestnetAccount, reset])
 

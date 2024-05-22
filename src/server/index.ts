@@ -1,5 +1,7 @@
 import { getPositions } from '@/api/get-positions'
-import { TRPCError, inferRouterInputs, inferRouterOutputs } from '@trpc/server'
+import { throwApiError } from '@/functions/get-api-error-message'
+import { validateKeys } from '@/functions/validate-keys'
+import { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 import { baseApiSchema } from './schemas/base-api-schema'
 import { createTRPCRouter, publicProcedure } from './trpc'
 
@@ -9,21 +11,19 @@ export const appRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { apiKey, isTestnetAccount, secretKey } = input
 
-      if (apiKey.length === 0 || secretKey.length === 0) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'You have to set your credentials keys in order to make this request.',
+      validateKeys({ apiKey, secretKey })
+
+      try {
+        const positions = await getPositions({
+          apiKey,
+          isTestnetAccount,
+          secretKey,
         })
+
+        return positions
+      } catch (error) {
+        throwApiError({ error, errorMessage: "Couldn't fetch your positions." })
       }
-
-      const positions = await getPositions({
-        apiKey,
-        isTestnetAccount,
-        secretKey,
-      })
-
-      return positions
     }),
 })
 

@@ -44,14 +44,11 @@ export async function getPositions({
   const query = generateQueryString({ params, secretKey })
   const api = isTestnetAccount ? testnetBinanceApi : binanceApi
 
-  const response = await api.get<GetPositionResponse>(
-    `/fapi/v2/positionRisk${query}`,
-    {
-      headers: {
-        'X-MBX-APIKEY': apiKey ?? '',
-      },
+  const response = await api.get(`/fapi/v2/positionRisk${query}`, {
+    headers: {
+      'X-MBX-APIKEY': apiKey ?? '',
     },
-  )
+  })
 
   return response.data
 }
