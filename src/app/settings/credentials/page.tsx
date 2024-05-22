@@ -13,7 +13,7 @@ export default function Credentials() {
       <CardHeader>
         <CardTitle>Keys</CardTitle>
         <CardDescription>
-          Set your binance keys to use the application. This information is
+          Set your Binance keys to use the application. This information is
           secured and will only be used inside the app.
         </CardDescription>
       </CardHeader>
