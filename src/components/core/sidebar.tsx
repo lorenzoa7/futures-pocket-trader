@@ -13,7 +13,6 @@ import { buttonVariants } from '../ui/button'
 export function Sidebar() {
   const pathname = usePathname()
   const paths = pathname.split('/')
-  console.log(navConfig[0].href.split('/'))
 
   return (
     <aside className="flex flex-col space-y-6 border-r border-border">
