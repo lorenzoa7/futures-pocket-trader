@@ -18,12 +18,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={cn('font-fira antialiased', fira.variable)}
         suppressHydrationWarning
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          disableTransitionOnChange
+          enableSystem
+        >
           <div className="grid h-screen grid-cols-[18rem_1fr]">
             <Sidebar />
             <main className="flex flex-1 flex-col">{children}</main>

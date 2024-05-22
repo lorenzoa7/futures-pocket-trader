@@ -1,8 +1,18 @@
 export const siteRoutes = {
-  account: '/account',
-  createOrder: '/create-order',
-  information: '/information',
-} as const
+  settings: {
+    credentials: '/settings/credentials',
+    connection: '/settings/connection',
+    appearance: '/settings/appearance',
+  },
+  createOrder: {
+    single: '/create-order/single',
+    split: '/create-order/split',
+  },
+  information: {
+    orders: '/information/orders',
+    positions: '/information/positions',
+  },
+}
 
 export type SiteRoutes = typeof siteRoutes
 
