@@ -1,6 +1,7 @@
 import { defaultParams } from '@/config/connections'
 import { generateQueryString } from '@/functions/generate-query-string'
-import { binanceApi, testnetBinanceApi } from '@/lib/axios'
+import { getApi } from '@/functions/get-api'
+import { BaseApiSchemaWithCredentials } from '@/server/schemas/base-api-schema'
 
 export type Position = {
   symbol: string
@@ -25,24 +26,18 @@ export type Position = {
 
 export type GetPositionResponse = Position[]
 
-type Props = {
-  apiKey: string
-  secretKey: string
-  isTestnetAccount: boolean
-}
-
 export async function getPositions({
   apiKey,
   secretKey,
   isTestnetAccount,
-}: Props) {
+}: BaseApiSchemaWithCredentials) {
   const params = {
     recvWindow: defaultParams.recvWindow,
     timestamp: defaultParams.timestamp,
   }
 
   const query = generateQueryString({ params, secretKey })
-  const api = isTestnetAccount ? testnetBinanceApi : binanceApi
+  const api = getApi(isTestnetAccount)
 
   const response = await api.get<GetPositionResponse>(
     `/fapi/v2/positionRisk${query}`,

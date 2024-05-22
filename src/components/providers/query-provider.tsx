@@ -39,8 +39,8 @@ export function QueryProvider({ children }: PropsWithChildren) {
       links: [
         httpBatchLink({
           url: `${env.NEXT_PUBLIC_API_URL}/trpc`,
-          fetch(url) {
-            return fetch(url)
+          fetch(url, options) {
+            return fetch(url, options)
           },
           transformer: SuperJSON,
         }),
