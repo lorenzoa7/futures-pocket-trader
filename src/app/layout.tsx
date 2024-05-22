@@ -1,4 +1,5 @@
 import { Sidebar } from '@/components/core/sidebar'
+import { QueryProvider } from '@/components/providers/query-provider'
 import ThemeProvider from '@/components/providers/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { fira } from '@/lib/fonts'
@@ -29,20 +30,22 @@ export default function RootLayout({
           disableTransitionOnChange
           enableSystem
         >
-          <div className="grid h-screen grid-cols-[18rem_1fr]">
-            <Sidebar />
-            <main className="flex flex-1 flex-col">{children}</main>
-          </div>
-          <Toaster
-            richColors
-            expand={true}
-            visibleToasts={1}
-            toastOptions={{
-              style: {
-                backgroundColor: '#1e293b',
-              },
-            }}
-          />
+          <QueryProvider>
+            <div className="grid h-screen grid-cols-[18rem_1fr]">
+              <Sidebar />
+              <main className="flex flex-1 flex-col">{children}</main>
+            </div>
+            <Toaster
+              richColors
+              expand={true}
+              visibleToasts={1}
+              toastOptions={{
+                style: {
+                  backgroundColor: '#1e293b',
+                },
+              }}
+            />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -39,3 +39,14 @@ export const settingsNavConfig: NavItem[] = [
     href: siteRoutes.settings.appearance,
   },
 ]
+
+export const informationNavConfig: NavItem[] = [
+  {
+    title: 'Orders',
+    href: siteRoutes.information.orders,
+  },
+  {
+    title: 'Positions',
+    href: siteRoutes.information.positions,
+  },
+]
