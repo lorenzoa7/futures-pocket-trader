@@ -19,7 +19,3 @@ export const newOrderSchema = z.object({
 })
 
 export type NewOrderSchema = z.infer<typeof newOrderSchema>
-
-export const testSchema = z.object({
-  test: z.string(),
-})

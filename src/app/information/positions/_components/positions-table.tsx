@@ -158,6 +158,7 @@ export function PositionsTable() {
 
     const promises = dataList.map((data) =>
       newOrder({
+        noErrorMessage: true,
         api: {
           apiKey,
           isTestnetAccount,
@@ -195,6 +196,7 @@ export function PositionsTable() {
 
     try {
       await newOrder({
+        noErrorMessage: true,
         shouldRefetch: true,
         api: {
           apiKey,
@@ -234,6 +236,7 @@ export function PositionsTable() {
 
     try {
       await newOrder({
+        noErrorMessage: true,
         shouldRefetch: true,
         api: {
           apiKey,
@@ -273,6 +276,7 @@ export function PositionsTable() {
       data.price = roundToDecimals(correctedPrice, precision.price)
 
       return newOrder({
+        noErrorMessage: true,
         api: {
           apiKey,
           isTestnetAccount,
