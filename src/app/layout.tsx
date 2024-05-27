@@ -35,16 +35,7 @@ export default function RootLayout({
               <Sidebar />
               <main className="flex flex-1 flex-col">{children}</main>
             </div>
-            <Toaster
-              richColors
-              expand={true}
-              visibleToasts={1}
-              toastOptions={{
-                style: {
-                  backgroundColor: '#1e293b',
-                },
-              }}
-            />
+            <Toaster richColors expand={true} visibleToasts={1} />
           </QueryProvider>
         </ThemeProvider>
       </body>

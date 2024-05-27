@@ -50,3 +50,14 @@ export const informationNavConfig: NavItem[] = [
     href: siteRoutes.information.orders,
   },
 ]
+
+export const createOrderNavConfig: NavItem[] = [
+  {
+    title: 'Single',
+    href: siteRoutes.createOrder.single,
+  },
+  {
+    title: 'Split',
+    href: siteRoutes.createOrder.split,
+  },
+]

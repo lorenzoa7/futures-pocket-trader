@@ -177,7 +177,9 @@ export function OrdersTable() {
                         {isPendingOrders ? (
                           <div className="mx-auto flex items-center gap-2 py-3">
                             <Spinner />
-                            <span>Loading currencies...</span>
+                            <span className="text-sm">
+                              Loading currencies...
+                            </span>
                           </div>
                         ) : (
                           <>

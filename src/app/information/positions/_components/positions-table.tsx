@@ -39,6 +39,7 @@ import { sides } from '@/config/currency'
 import { convertPriceToUsdt } from '@/functions/convert-price-to-usdt'
 import { getPositionSide } from '@/functions/get-position-side'
 import { mergeObjects } from '@/functions/merge-objects'
+import { resolveError } from '@/functions/resolve-error'
 import { roundToDecimals } from '@/functions/round-to-decimals'
 import { useAccountStore } from '@/hooks/store/use-account-store'
 import { cn } from '@/lib/utils'
@@ -50,7 +51,6 @@ import {
 import { SingleOrderSchema } from '@/schemas/single-order-schema'
 import { trpc } from '@/server/client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { TRPCClientError } from '@trpc/client'
 import { Check, ChevronsUpDown, RefreshCcw, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -196,7 +196,6 @@ export function PositionsTable() {
 
     try {
       await newOrder({
-        noErrorMessage: true,
         shouldRefetch: true,
         api: {
           apiKey,
@@ -209,16 +208,7 @@ export function PositionsTable() {
 
       toast.success('Close market order created successfully!')
     } catch (error) {
-      if (error instanceof TRPCClientError) {
-        const [errorTitle, errorMessage] = error.message.split('|')
-        toast.error(errorTitle, {
-          description:
-            errorMessage && errorMessage.length > 0 ? errorMessage : undefined,
-        })
-        return
-      }
-
-      toast.error("Couldn't create a close market order.")
+      resolveError(error, "Couldn't create a close market order.")
     }
   }
 
@@ -353,7 +343,9 @@ export function PositionsTable() {
                         {isPendingPositions ? (
                           <div className="mx-auto flex items-center gap-2 py-3">
                             <Spinner />
-                            <span>Loading currencies...</span>
+                            <span className="text-sm">
+                              Loading currencies...
+                            </span>
                           </div>
                         ) : (
                           <>

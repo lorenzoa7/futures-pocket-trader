@@ -4,6 +4,8 @@ import { getPositions } from '@/api/get-positions'
 import { getSymbolPrice } from '@/api/get-symbol-price'
 import { getSymbols } from '@/api/get-symbols'
 import { newOrder } from '@/api/new-order'
+import { setLeverage } from '@/api/set-leverage'
+import { setMarginType } from '@/api/set-margin-type'
 import { throwApiError } from '@/functions/get-api-error-message'
 import { validateKeys } from '@/functions/validate-keys'
 import { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
@@ -14,6 +16,8 @@ import {
 import { cancelOrderSchema } from './schemas/cancel-order-schema'
 import { getSymbolPriceSchema } from './schemas/get-symbol-price-schema'
 import { newOrderSchema } from './schemas/new-order-schema'
+import { setLeverageSchema } from './schemas/set-leverage-schema'
+import { setMarginTypeSchema } from './schemas/set-margin-type-schema'
 import { createTRPCRouter, publicProcedure } from './trpc'
 
 export const appRouter = createTRPCRouter({
@@ -117,6 +121,45 @@ export const appRouter = createTRPCRouter({
       } catch (error) {
         if (!noErrorMessage) {
           throwApiError({ error, errorMessage: "Couldn't cancel the order." })
+          return
+        }
+
+        console.error(error)
+      }
+    }),
+  setLeverage: publicProcedure
+    .input(setLeverageSchema)
+    .mutation(async ({ input }) => {
+      const { api, noErrorMessage } = input
+
+      try {
+        const response = await setLeverage(api)
+
+        return response
+      } catch (error) {
+        if (!noErrorMessage) {
+          throwApiError({ error, errorMessage: "Couldn't set the leverage." })
+          return
+        }
+
+        console.error(error)
+      }
+    }),
+  setMarginType: publicProcedure
+    .input(setMarginTypeSchema)
+    .mutation(async ({ input }) => {
+      const { api, noErrorMessage } = input
+
+      try {
+        const response = await setMarginType(api)
+
+        return response
+      } catch (error) {
+        if (!noErrorMessage) {
+          throwApiError({
+            error,
+            errorMessage: "Couldn't set the margin type.",
+          })
           return
         }
 
