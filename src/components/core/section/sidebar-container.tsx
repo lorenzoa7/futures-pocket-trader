@@ -6,7 +6,10 @@ type Props = ComponentProps<'div'>
 export function SectionSidebarContainer({ className, ...props }: Props) {
   return (
     <div
-      className={cn('grid grid-cols-[16rem_1fr] gap-4', className)}
+      className={cn(
+        'grid lg:grid-cols-[16rem_1fr] gap-4 grid-cols-1',
+        className,
+      )}
       {...props}
     />
   )

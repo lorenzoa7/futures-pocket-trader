@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { NewOrderButton } from './_components/new-order-button'
 import { PositionsTable } from './_components/positions-table'
 
 export default function Positions() {
@@ -17,7 +16,6 @@ export default function Positions() {
       </CardHeader>
       <CardContent>
         <PositionsTable />
-        <NewOrderButton />
       </CardContent>
     </Card>
   )

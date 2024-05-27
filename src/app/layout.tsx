@@ -1,4 +1,3 @@
-import { Sidebar } from '@/components/core/sidebar'
 import { QueryProvider } from '@/components/providers/query-provider'
 import ThemeProvider from '@/components/providers/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
@@ -31,10 +30,7 @@ export default function RootLayout({
           enableSystem
         >
           <QueryProvider>
-            <div className="grid h-screen grid-cols-[18rem_1fr]">
-              <Sidebar />
-              <main className="flex flex-1 flex-col">{children}</main>
-            </div>
+            {children}
             <Toaster richColors expand={true} visibleToasts={1} />
           </QueryProvider>
         </ThemeProvider>

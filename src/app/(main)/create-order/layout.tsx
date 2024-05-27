@@ -1,14 +1,18 @@
 import { Section } from '@/components/core/section'
 import { SectionSidebar } from '@/components/core/section/sidebar'
 import { SectionSidebarContainer } from '@/components/core/section/sidebar-container'
-import { settingsNavConfig } from '@/config/nav'
+import { navConfig } from '@/config/nav'
 import { PropsWithChildren } from 'react'
 
-export default function SettingsLayout({ children }: PropsWithChildren) {
+export default function CreateOrderLayout({ children }: PropsWithChildren) {
+  const submenuItems = navConfig.find(
+    (item) => item.title === 'Create order',
+  )?.submenu
+
   return (
-    <Section title="Settings">
+    <Section title="Create Order">
       <SectionSidebarContainer>
-        <SectionSidebar navItems={settingsNavConfig} />
+        {submenuItems && <SectionSidebar navItems={submenuItems} />}
 
         {children}
       </SectionSidebarContainer>

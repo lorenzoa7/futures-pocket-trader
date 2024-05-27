@@ -163,7 +163,7 @@ export function CreateSingleOrderForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleCreateOrder)}
-        className="flex w-72 flex-col gap-3"
+        className="flex w-full flex-col gap-3 lg:w-72"
       >
         <FormField
           control={form.control}
@@ -200,7 +200,7 @@ export function CreateSingleOrderForm() {
                     </>
                   )}
                 </div>
-                <PopoverContent className="p-0">
+                <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
                   <Command>
                     {isPendingSymbols ? (
                       <div className="mx-auto flex items-center gap-2 py-3">

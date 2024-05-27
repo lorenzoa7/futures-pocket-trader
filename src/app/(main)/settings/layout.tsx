@@ -1,14 +1,18 @@
 import { Section } from '@/components/core/section'
 import { SectionSidebar } from '@/components/core/section/sidebar'
 import { SectionSidebarContainer } from '@/components/core/section/sidebar-container'
-import { informationNavConfig } from '@/config/nav'
+import { navConfig } from '@/config/nav'
 import { PropsWithChildren } from 'react'
 
-export default function InformationLayout({ children }: PropsWithChildren) {
+export default function SettingsLayout({ children }: PropsWithChildren) {
+  const submenuItems = navConfig.find(
+    (item) => item.title === 'Settings',
+  )?.submenu
+
   return (
-    <Section title="Information">
+    <Section title="Settings">
       <SectionSidebarContainer>
-        <SectionSidebar navItems={informationNavConfig} />
+        {submenuItems && <SectionSidebar navItems={submenuItems} />}
 
         {children}
       </SectionSidebarContainer>

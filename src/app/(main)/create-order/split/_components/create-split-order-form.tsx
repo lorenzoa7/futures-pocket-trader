@@ -1,8 +1,8 @@
 'use client'
 
-import { ConfirmSplitOrderDialog } from '@/app/create-order/_components/confirm-split-order-dialog'
-import { LeveragePopover } from '@/app/create-order/_components/leverage-popover'
-import { MarginTypePopover } from '@/app/create-order/_components/margin-type-popover'
+import { ConfirmSplitOrderDialog } from '@/app/(main)/create-order/_components/confirm-split-order-dialog'
+import { LeveragePopover } from '@/app/(main)/create-order/_components/leverage-popover'
+import { MarginTypePopover } from '@/app/(main)/create-order/_components/margin-type-popover'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -204,7 +204,7 @@ export function CreateSplitOrderForm() {
                       </>
                     )}
                   </div>
-                  <PopoverContent className="p-0">
+                  <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
                     <Command>
                       {isPendingSymbols ? (
                         <div className="mx-auto flex items-center gap-2 py-3">

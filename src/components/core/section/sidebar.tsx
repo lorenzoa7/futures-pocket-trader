@@ -1,17 +1,18 @@
 'use client'
 
 import { NavItem } from '@/config/nav'
+import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ComponentProps } from 'react'
 
 type Props = { navItems: NavItem[] } & ComponentProps<'aside'>
 
-export function SectionSidebar({ navItems, ...props }: Props) {
+export function SectionSidebar({ navItems, className, ...props }: Props) {
   const pathname = usePathname()
 
   return (
-    <aside {...props}>
+    <aside className={cn('hidden lg:block', className)} {...props}>
       <nav className="flex flex-col gap-2">
         {navItems.map(({ title, href, icon: Icon }) => (
           <Link
