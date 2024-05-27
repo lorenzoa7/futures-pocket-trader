@@ -7,7 +7,7 @@ export default function Spinner({ className, ...rest }: Props) {
     <svg
       aria-hidden="true"
       className={cn(
-        'size-5 animate-spin text-gray-600 fill-amber-300',
+        'size-5 animate-spin dark:text-gray-600 dark:fill-amber-300 fill-amber-700 text-gray-400',
         className,
       )}
       viewBox="0 0 100 101"

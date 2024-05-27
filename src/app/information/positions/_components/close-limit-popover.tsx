@@ -74,12 +74,12 @@ export function CloseLimitPopover({
           type="button"
           variant="link"
           disabled={isPending || isPendingPrice}
-          className="h-4 px-0 dark:text-yellow-500 dark:hover:text-yellow-400"
+          className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
         >
           Limit
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="dark border-slate-800 bg-slate-950 text-slate-50">
+      <PopoverContent>
         <Form {...form}>
           <form
             onSubmit={stopPropagate(form.handleSubmit(handleSubmit))}
@@ -158,14 +158,14 @@ export function CloseLimitPopover({
             />
             <Button
               type="submit"
-              className="flex w-32 items-center gap-2 border-slate-800 bg-slate-950 hover:bg-slate-800 hover:text-slate-50"
+              className="flex w-32 items-center gap-2"
               variant="outline"
               disabled={isPending || isPendingPrice}
               onClick={(e) => {
                 e.stopPropagation()
               }}
             >
-              {isPending && <Spinner className="fill-white text-slate-800" />}
+              {isPending && <Spinner />}
               Confirm
             </Button>
           </form>

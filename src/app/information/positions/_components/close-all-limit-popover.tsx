@@ -6,6 +6,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import Spinner from '@/components/ui/spinner'
+
 import {
   CloseLimitQuantityPercentages,
   closeLimitQuantityPercentages,
@@ -72,12 +73,12 @@ export function CloseAllLimitPopover({
           type="button"
           variant="link"
           disabled={isPending}
-          className="h-4 px-0 dark:text-yellow-500 dark:hover:text-yellow-400"
+          className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
         >
           Limit
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="dark border-slate-800 bg-slate-950 text-slate-50">
+      <PopoverContent>
         <Form {...form}>
           <form
             onSubmit={stopPropagate(form.handleSubmit(handleSubmit))}
@@ -98,7 +99,7 @@ export function CloseAllLimitPopover({
                   variant="outline"
                   size="sm"
                   data-selected={selectedPercentage === percentage}
-                  className="w-12 px-2 text-sm dark:data-[selected=true]:bg-slate-800"
+                  className="w-12 px-2 text-sm data-[selected=true]:bg-slate-200 dark:data-[selected=true]:bg-slate-800"
                   onClick={() => {
                     setSelectedPercentage(percentage)
                     symbolsInformation.forEach((symbolInformation, index) => {
@@ -120,14 +121,14 @@ export function CloseAllLimitPopover({
 
             <Button
               type="submit"
-              className="flex w-32 items-center gap-2 border-slate-800 bg-slate-950 hover:bg-slate-800 hover:text-slate-50"
+              className="flex w-32 items-center gap-2"
               variant="outline"
               disabled={isPending}
               onClick={(e) => {
                 e.stopPropagation()
               }}
             >
-              {isPending && <Spinner className="fill-white text-slate-800" />}
+              {isPending && <Spinner />}
               Confirm
             </Button>
           </form>

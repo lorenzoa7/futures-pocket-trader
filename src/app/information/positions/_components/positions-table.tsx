@@ -8,6 +8,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from '@/components/ui/command'
 import {
   Form,
@@ -343,7 +344,7 @@ export function PositionsTable() {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="dark w-40 border-slate-800 bg-transparent p-0">
+                    <PopoverContent className="w-40 p-0">
                       <Command>
                         {isPendingPositions ? (
                           <div className="mx-auto flex items-center gap-2 py-3">
@@ -352,39 +353,38 @@ export function PositionsTable() {
                           </div>
                         ) : (
                           <>
-                            <CommandInput
-                              placeholder="Search symbol..."
-                              className="border-slate-800"
-                            />
+                            <CommandInput placeholder="Search symbol..." />
                             <CommandEmpty>No symbol found.</CommandEmpty>
                             <CommandGroup>
-                              <ScrollArea viewportClassName="max-h-32">
-                                {openPositionsSymbols?.map((symbol) => (
-                                  <CommandItem
-                                    value={symbol}
-                                    key={symbol}
-                                    onSelect={() => {
-                                      form.setValue('symbol', symbol)
+                              <CommandList>
+                                <ScrollArea viewportClassName="max-h-32">
+                                  {openPositionsSymbols.map((symbol) => (
+                                    <CommandItem
+                                      value={symbol}
+                                      key={symbol}
+                                      onSelect={() => {
+                                        form.setValue('symbol', symbol)
 
-                                      if (formRef && formRef.current) {
-                                        formRef.current.requestSubmit()
-                                      }
+                                        if (formRef && formRef.current) {
+                                          formRef.current.requestSubmit()
+                                        }
 
-                                      setOpenSymbolFilter(false)
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        'mr-2 h-4 w-4',
-                                        symbol === field.value
-                                          ? 'opacity-100'
-                                          : 'opacity-0',
-                                      )}
-                                    />
-                                    {symbol}
-                                  </CommandItem>
-                                ))}
-                              </ScrollArea>
+                                        setOpenSymbolFilter(false)
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          symbol === field.value
+                                            ? 'opacity-100'
+                                            : 'opacity-0',
+                                        )}
+                                      />
+                                      {symbol}
+                                    </CommandItem>
+                                  ))}
+                                </ScrollArea>
+                              </CommandList>
                             </CommandGroup>
                           </>
                         )}
@@ -440,35 +440,37 @@ export function PositionsTable() {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="dark w-40 border-slate-800 bg-transparent p-0">
+                    <PopoverContent className="w-40 p-0">
                       <Command>
-                        <CommandGroup>
-                          {sides.map((side) => (
-                            <CommandItem
-                              value={side}
-                              key={side}
-                              onSelect={() => {
-                                form.setValue('side', side)
+                        <CommandList>
+                          <CommandGroup>
+                            {sides.map((side) => (
+                              <CommandItem
+                                value={side}
+                                key={side}
+                                onSelect={() => {
+                                  form.setValue('side', side)
 
-                                if (formRef && formRef.current) {
-                                  formRef.current.requestSubmit()
-                                }
+                                  if (formRef && formRef.current) {
+                                    formRef.current.requestSubmit()
+                                  }
 
-                                setOpenSideFilter(false)
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  side === field.value
-                                    ? 'opacity-100'
-                                    : 'opacity-0',
-                                )}
-                              />
-                              {side}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
+                                  setOpenSideFilter(false)
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    side === field.value
+                                      ? 'opacity-100'
+                                      : 'opacity-0',
+                                  )}
+                                />
+                                {side}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
                       </Command>
                     </PopoverContent>
                   </Popover>
@@ -521,7 +523,7 @@ export function PositionsTable() {
           </div>
         ) : filteredPositions && filteredPositions.length > 0 ? (
           <Table className="relative rounded-2xl" hasWrapper={false}>
-            <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-800 ">
+            <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-200 dark:bg-slate-800">
               <TableRow>
                 <TableHead className="w-56">Symbol</TableHead>
                 <TableHead className="w-52">Side</TableHead>
@@ -534,14 +536,14 @@ export function PositionsTable() {
                     variant="link"
                     disabled={isPendingNewOrder}
                     onClick={handleCloseAll}
-                    className="h-4 px-0 dark:text-yellow-500 dark:hover:text-yellow-400"
+                    className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
                   >
                     {isPendingNewOrder ? <Spinner /> : <span>Market</span>}
                   </Button>
 
                   <Separator
                     orientation="vertical"
-                    className="inline-block h-4 dark:bg-slate-700"
+                    className="inline-block h-4"
                   />
 
                   {isPendingSymbolsPrices ? (
@@ -601,12 +603,12 @@ export function PositionsTable() {
                     <TableRow key={index}>
                       <TableCell className="flex gap-1.5 font-medium">
                         <span>{position.symbol}</span>
-                        <span className="rounded bg-stone-800 px-1 text-yellow-500">{`${position.leverage}x`}</span>
+                        <span className="rounded bg-slate-200 px-1 text-yellow-600 dark:bg-slate-800 dark:text-yellow-400">{`${position.leverage}x`}</span>
                       </TableCell>
                       <TableCell
                         data-long={positionSide === 'LONG'}
                         data-short={positionSide === 'SHORT'}
-                        className="data-[long=true]:text-green-400 data-[short=true]:text-red-400"
+                        className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
                       >
                         {positionSide}
                       </TableCell>
@@ -627,15 +629,12 @@ export function PositionsTable() {
                           onClick={() => {
                             handleCloseMarket(position)
                           }}
-                          className="h-4 px-0 dark:text-yellow-500 dark:hover:text-yellow-400"
+                          className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
                         >
                           Market
                         </Button>
 
-                        <Separator
-                          orientation="vertical"
-                          className="h-4 dark:bg-slate-700"
-                        />
+                        <Separator orientation="vertical" className="h-4" />
 
                         {symbolData && (
                           <CloseLimitPopover
@@ -655,7 +654,7 @@ export function PositionsTable() {
                   )
                 })}
             </TableBody>
-            <TableFooter className="sticky -bottom-px z-10 translate-y-px dark:bg-slate-800">
+            <TableFooter className="sticky -bottom-px z-10 translate-y-px bg-slate-200 dark:bg-slate-800">
               <TableRow>
                 <TableCell colSpan={4}>Total (USDT)</TableCell>
                 <TableCell className="text-right">
@@ -678,7 +677,7 @@ export function PositionsTable() {
             </TableFooter>
           </Table>
         ) : (
-          <div className="h-full w-[30.5rem] px-10 text-center">
+          <div className="text-center">
             <Label>
               There are no open positions or <br />
               no open positions matches your filters.
