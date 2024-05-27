@@ -324,7 +324,7 @@ export function CreateSingleOrderForm() {
           )}
         />
 
-        <div className="flex gap-2">
+        <div className="mt-2 flex gap-2">
           <Button
             variant="secondary"
             type="submit"

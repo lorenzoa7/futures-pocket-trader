@@ -16,10 +16,11 @@ export function Sidebar() {
 
   return (
     <aside className="flex flex-col space-y-6 border-r border-border">
-      <header className="flex items-center gap-3 border-b border-border p-6">
+      <header className="flex select-none items-center gap-3 border-b border-border p-6">
         <Image src={Logo} alt="Pocket Trader's logo." width={24} height={24} />
         <h1 className="text-xl font-semibold">
-          <span className="text-amber-400">futures</span> pocket trader
+          <span className="text-amber-600 dark:text-amber-400">futures</span>{' '}
+          pocket trader
         </h1>
       </header>
 

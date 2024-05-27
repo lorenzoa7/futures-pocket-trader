@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { CreateSplitOrderForm } from './_components/create-split-order-form'
 
 export default function Split() {
   return (
@@ -15,7 +16,9 @@ export default function Split() {
           Set the parameters and create multiple splitted orders.
         </CardDescription>
       </CardHeader>
-      <CardContent>Split</CardContent>
+      <CardContent>
+        <CreateSplitOrderForm />
+      </CardContent>
     </Card>
   )
 }
