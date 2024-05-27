@@ -15,7 +15,7 @@ export const navConfig: NavItem[] = [
   },
   {
     title: 'Information',
-    href: siteRoutes.information.orders,
+    href: siteRoutes.information.positions,
     icon: BookTextIcon,
   },
   {
@@ -42,11 +42,11 @@ export const settingsNavConfig: NavItem[] = [
 
 export const informationNavConfig: NavItem[] = [
   {
-    title: 'Orders',
-    href: siteRoutes.information.orders,
-  },
-  {
     title: 'Positions',
     href: siteRoutes.information.positions,
+  },
+  {
+    title: 'Orders',
+    href: siteRoutes.information.orders,
   },
 ]
