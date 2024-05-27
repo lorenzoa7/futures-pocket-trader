@@ -10,7 +10,6 @@ import {
 import { httpBatchLink } from '@trpc/client'
 import { PropsWithChildren, useState } from 'react'
 import { toast } from 'sonner'
-import SuperJSON from 'superjson'
 
 export function QueryProvider({ children }: PropsWithChildren) {
   const [queryClient] = useState(
@@ -42,7 +41,6 @@ export function QueryProvider({ children }: PropsWithChildren) {
           fetch(url, options) {
             return fetch(url, options)
           },
-          transformer: SuperJSON,
         }),
       ],
     }),

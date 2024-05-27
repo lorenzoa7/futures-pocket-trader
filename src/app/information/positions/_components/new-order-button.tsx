@@ -17,18 +17,19 @@ export function NewOrderButton() {
               apiKey,
               secretKey,
               isTestnetAccount,
-              type: 'MARKET',
+              type: 'LIMIT',
               data: {
                 symbol: 'BTCUSDT',
                 side: 'BUY',
-                isUsdtQuantity: true,
-                quantity: 500,
+                isUsdtQuantity: false,
+                quantity: 0.007,
+                price: 67999.4,
               },
             },
           })
         }
       >
-        Criar ordem
+        Create order(test)
       </Button>
     </>
   )

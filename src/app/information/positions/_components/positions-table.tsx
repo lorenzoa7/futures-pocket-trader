@@ -49,7 +49,6 @@ import {
 import { SingleOrderSchema } from '@/schemas/single-order-schema'
 import { trpc } from '@/server/client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
 import { Check, ChevronsUpDown, RefreshCcw, X } from 'lucide-react'
 import { useRef, useState } from 'react'
@@ -62,6 +61,7 @@ import {
 import { CloseLimitPopover } from './close-limit-popover'
 
 export function PositionsTable() {
+  const trpcUtils = trpc.useUtils()
   const { apiKey, isTestnetAccount, secretKey } = useAccountStore()
   const {
     data: positions,
@@ -80,9 +80,16 @@ export function PositionsTable() {
   const { data: symbols } = trpc.getSymbols.useQuery({ isTestnetAccount })
 
   const { mutateAsync: newOrder, isPending: isPendingNewOrder } =
-    trpc.newOrder.useMutation()
-
-  const queryClient = useQueryClient()
+    trpc.newOrder.useMutation({
+      onSuccess: async (_, variables) => {
+        if (variables.shouldRefetch) {
+          await Promise.all([
+            // TODO: invalidate get orders
+            trpcUtils.getPositions.invalidate(),
+          ])
+        }
+      },
+    })
 
   const [filter, setFilter] = useState<InformationFilterSchema>({
     side: undefined,
@@ -164,10 +171,8 @@ export function PositionsTable() {
       await Promise.all(promises)
 
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ['open-orders'],
-        }),
-        queryClient.invalidateQueries({ queryKey: ['positions'] }),
+        // TODO: invalidate get orders
+        trpcUtils.getPositions.invalidate(),
       ])
 
       toast.success('Close market order created successfully!')
@@ -189,6 +194,7 @@ export function PositionsTable() {
 
     try {
       await newOrder({
+        shouldRefetch: true,
         api: {
           apiKey,
           isTestnetAccount,
@@ -227,6 +233,7 @@ export function PositionsTable() {
 
     try {
       await newOrder({
+        shouldRefetch: true,
         api: {
           apiKey,
           isTestnetAccount,
@@ -277,12 +284,9 @@ export function PositionsTable() {
 
     try {
       await Promise.all(promises)
-
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ['open-orders'],
-        }),
-        queryClient.invalidateQueries({ queryKey: ['positions'] }),
+        // TODO: invalidate get orders
+        trpcUtils.getPositions.invalidate(),
       ])
 
       setOpenCloseAllLimitPopover(false)
@@ -298,7 +302,7 @@ export function PositionsTable() {
   const handleRefreshPositions = () => {
     setValue('symbol', undefined)
     setValue('side', undefined)
-    queryClient.invalidateQueries({ queryKey: ['positions'] })
+    trpcUtils.getPositions.invalidate()
   }
 
   const formRef = useRef<HTMLFormElement>(null)

@@ -3,7 +3,8 @@ import { z } from 'zod'
 import { baseApiSchemaWithCredentials } from './base-api-schema'
 
 export const newOrderSchema = z.object({
-  noErrorMessage: z.boolean().optional(),
+  noErrorMessage: z.boolean().optional().default(false),
+  shouldRefetch: z.boolean().optional().default(false),
   api: z
     .object({ type: z.literal('LIMIT'), data: singleOrderSchema })
     .merge(baseApiSchemaWithCredentials)
