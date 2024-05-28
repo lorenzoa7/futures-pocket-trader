@@ -3,6 +3,7 @@
 import { ConfirmSplitOrderDialog } from '@/app/(main)/create-order/_components/confirm-split-order-dialog'
 import { LeveragePopover } from '@/app/(main)/create-order/_components/leverage-popover'
 import { MarginTypePopover } from '@/app/(main)/create-order/_components/margin-type-popover'
+import { SetCredentialsKeysWarning } from '@/components/core/set-credentials-keys-warning'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -52,7 +53,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 export function CreateSplitOrderForm() {
-  const { isTestnetAccount } = useAccountStore()
+  const { apiKey, secretKey, isTestnetAccount } = useAccountStore()
 
   const form = useForm<SplitOrderSchema>({
     resolver: zodResolver(splitOrderSchema),
@@ -158,240 +159,246 @@ export function CreateSplitOrderForm() {
 
   return (
     <>
-      <ConfirmSplitOrderDialog
-        open={openConfirmationDialog}
-        setOpen={setOpenConfirmationDialog}
-        setData={setData}
-        data={data}
-      />
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleCreateSplitOrder)}
-          className="flex w-72 flex-col gap-3"
-        >
-          <FormField
-            control={form.control}
-            name="symbol"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Symbol</FormLabel>
-
-                <Popover open={open} onOpenChange={setOpen}>
-                  <div className="flex gap-2">
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            'justify-between w-full truncate',
-                            !field.value && 'text-muted-foreground',
-                          )}
-                        >
-                          {field.value
-                            ? symbols?.find(
-                                (symbol) => symbol.symbol === field.value,
-                              )?.symbol
-                            : 'Select symbol'}
-                          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    {symbolWatch && symbolWatch.length > 0 && (
-                      <>
-                        <LeveragePopover symbol={symbolWatch} />
-                        <MarginTypePopover symbol={symbolWatch} />
-                      </>
-                    )}
-                  </div>
-                  <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
-                    <Command>
-                      {isPendingSymbols ? (
-                        <div className="mx-auto flex items-center gap-2 py-3">
-                          <Spinner />
-                          <span>Loading currencies...</span>
-                        </div>
-                      ) : (
-                        <>
-                          <CommandInput placeholder="Search symbol..." />
-                          <CommandEmpty>No symbol found.</CommandEmpty>
-                          <CommandGroup>
-                            <CommandList className="max-h-32">
-                              {symbols?.map((symbol) => (
-                                <CommandItem
-                                  value={symbol.symbol}
-                                  key={symbol.symbol}
-                                  onSelect={() => {
-                                    form.setValue('symbol', symbol.symbol)
-                                    setOpen(false)
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      'mr-2 h-4 w-4',
-                                      symbol.symbol === field.value
-                                        ? 'opacity-100'
-                                        : 'opacity-0',
-                                    )}
-                                  />
-                                  {symbol.symbol}
-                                </CommandItem>
-                              ))}
-                            </CommandList>
-                          </CommandGroup>
-                        </>
-                      )}
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-
-                <FormMessage />
-              </FormItem>
-            )}
+      {apiKey.length > 0 && secretKey.length > 0 ? (
+        <>
+          <ConfirmSplitOrderDialog
+            open={openConfirmationDialog}
+            setOpen={setOpenConfirmationDialog}
+            setData={setData}
+            data={data}
           />
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleCreateSplitOrder)}
+              className="flex w-72 flex-col gap-3"
+            >
+              <FormField
+                control={form.control}
+                name="symbol"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Symbol</FormLabel>
 
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Input
-                      type="number"
-                      {...field}
-                      className="[&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                    {isFetchingPrice ? (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <Spinner />
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <div className="flex gap-2">
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                'justify-between w-full truncate',
+                                !field.value && 'text-muted-foreground',
+                              )}
+                            >
+                              {field.value
+                                ? symbols?.find(
+                                    (symbol) => symbol.symbol === field.value,
+                                  )?.symbol
+                                : 'Select symbol'}
+                              <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        {symbolWatch && symbolWatch.length > 0 && (
+                          <>
+                            <LeveragePopover symbol={symbolWatch} />
+                            <MarginTypePopover symbol={symbolWatch} />
+                          </>
+                        )}
                       </div>
-                    ) : (
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded bg-slate-200 px-2 py-px text-sm font-medium duration-150 hover:bg-slate-200/50 dark:bg-slate-900 dark:hover:bg-slate-900/50"
-                        onClick={() => {
-                          if (lastPrice) {
-                            setValue('price', lastPrice)
-                          }
+                      <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
+                        <Command>
+                          {isPendingSymbols ? (
+                            <div className="mx-auto flex items-center gap-2 py-3">
+                              <Spinner />
+                              <span>Loading currencies...</span>
+                            </div>
+                          ) : (
+                            <>
+                              <CommandInput placeholder="Search symbol..." />
+                              <CommandEmpty>No symbol found.</CommandEmpty>
+                              <CommandGroup>
+                                <CommandList className="max-h-32">
+                                  {symbols?.map((symbol) => (
+                                    <CommandItem
+                                      value={symbol.symbol}
+                                      key={symbol.symbol}
+                                      onSelect={() => {
+                                        form.setValue('symbol', symbol.symbol)
+                                        setOpen(false)
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          symbol.symbol === field.value
+                                            ? 'opacity-100'
+                                            : 'opacity-0',
+                                        )}
+                                      />
+                                      {symbol.symbol}
+                                    </CommandItem>
+                                  ))}
+                                </CommandList>
+                              </CommandGroup>
+                            </>
+                          )}
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          {...field}
+                          className="[&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        {isFetchingPrice ? (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <Spinner />
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 rounded bg-slate-200 px-2 py-px text-sm font-medium duration-150 hover:bg-slate-200/50 dark:bg-slate-900 dark:hover:bg-slate-900/50"
+                            onClick={() => {
+                              if (lastPrice) {
+                                setValue('price', lastPrice)
+                              }
+                            }}
+                          >
+                            Last
+                          </button>
+                        )}
+                      </div>
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="size"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Size</FormLabel>
+                    <div className="flex gap-2">
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          className="[&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </FormControl>
+                      {currencies.length > 0 && (
+                        <Select
+                          value={isUsdtQuantity ? currencies[1] : currencies[0]}
+                          onValueChange={(value) => {
+                            setValue('isUsdtQuantity', value === 'USDT')
+                          }}
+                        >
+                          <SelectTrigger className="w-48 truncate">
+                            <SelectValue placeholder="Select a currency" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {currencies.map((currency) => (
+                              <SelectItem key={currency} value={currency}>
+                                {currency}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ordersQuantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Orders quantity</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        className="[&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dropPercentage"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Drop percentage - {field.value}%</FormLabel>
+                    <FormControl>
+                      <Slider
+                        min={0}
+                        max={99}
+                        step={1}
+                        defaultValue={[field.value]}
+                        onValueChange={(vals) => {
+                          field.onChange(vals[0])
                         }}
-                      >
-                        Last
-                      </button>
-                    )}
-                  </div>
-                </FormControl>
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="size"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Size</FormLabel>
-                <div className="flex gap-2">
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      className="[&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                  </FormControl>
-                  {currencies.length > 0 && (
-                    <Select
-                      value={isUsdtQuantity ? currencies[1] : currencies[0]}
-                      onValueChange={(value) => {
-                        setValue('isUsdtQuantity', value === 'USDT')
-                      }}
-                    >
-                      <SelectTrigger className="w-48 truncate">
-                        <SelectValue placeholder="Select a currency" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {currencies.map((currency) => (
-                          <SelectItem key={currency} value={currency}>
-                            {currency}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ordersQuantity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Orders quantity</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    className="[&::-webkit-inner-spin-button]:appearance-none"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="dropPercentage"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Drop percentage - {field.value}%</FormLabel>
-                <FormControl>
-                  <Slider
-                    min={0}
-                    max={99}
-                    step={1}
-                    defaultValue={[field.value]}
-                    onValueChange={(vals) => {
-                      field.onChange(vals[0])
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="mt-2 flex gap-2">
-            <Button
-              variant="secondary"
-              type="submit"
-              className="flex w-full items-center gap-2 bg-green-300 hover:bg-green-300/80 dark:bg-green-800 dark:hover:bg-green-800/80"
-              onClick={() => setValue('side', 'BUY')}
-              disabled={isSubmitting}
-            >
-              {isSubmitting && side === 'BUY' && <Spinner />}
-              Buy/Long
-            </Button>
-            <Button
-              variant="secondary"
-              type="submit"
-              className="flex w-full items-center gap-2 bg-red-300 hover:bg-red-300/80 dark:bg-red-800 dark:hover:bg-red-800/80"
-              onClick={() => setValue('side', 'SELL')}
-              disabled={isSubmitting}
-            >
-              {isSubmitting && side === 'SELL' && <Spinner />}
-              Sell/Short
-            </Button>
-          </div>
-        </form>
-      </Form>
+              <div className="mt-2 flex gap-2">
+                <Button
+                  variant="secondary"
+                  type="submit"
+                  className="flex w-full items-center gap-2 bg-green-300 hover:bg-green-300/80 dark:bg-green-800 dark:hover:bg-green-800/80"
+                  onClick={() => setValue('side', 'BUY')}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting && side === 'BUY' && <Spinner />}
+                  Buy/Long
+                </Button>
+                <Button
+                  variant="secondary"
+                  type="submit"
+                  className="flex w-full items-center gap-2 bg-red-300 hover:bg-red-300/80 dark:bg-red-800 dark:hover:bg-red-800/80"
+                  onClick={() => setValue('side', 'SELL')}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting && side === 'SELL' && <Spinner />}
+                  Sell/Short
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </>
+      ) : (
+        <SetCredentialsKeysWarning />
+      )}
     </>
   )
 }

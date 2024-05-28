@@ -1,6 +1,7 @@
 'use client'
 
 import { GetPositionResponse, Position } from '@/api/get-positions'
+import { SetCredentialsKeysWarning } from '@/components/core/set-credentials-keys-warning'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -306,381 +307,393 @@ export function PositionsTable() {
 
   return (
     <>
-      <Form {...form}>
-        <form onSubmit={handleSubmit(handleFilter)} ref={formRef}>
-          <Label>Filters</Label>
-          <div className="my-2 flex gap-2.5">
-            <FormField
-              control={form.control}
-              name="symbol"
-              render={({ field }) => (
-                <FormItem className="relative flex flex-col">
-                  <Popover
-                    open={openSymbolFilter}
-                    onOpenChange={setOpenSymbolFilter}
-                  >
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            'justify-between w-40',
-                            !field.value && 'text-muted-foreground',
-                          )}
-                        >
-                          {field.value
-                            ? openPositionsSymbols.find(
-                                (symbol) => symbol === field.value,
-                              )
-                            : 'Select symbol'}
-                          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-40 p-0">
-                      <Command>
-                        {isPendingPositions ? (
-                          <div className="mx-auto flex items-center gap-2 py-3">
-                            <Spinner />
-                            <span className="text-sm">
-                              Loading currencies...
-                            </span>
-                          </div>
-                        ) : (
-                          <>
-                            <CommandInput placeholder="Search symbol..." />
-                            <CommandEmpty>No symbol found.</CommandEmpty>
-                            <CommandGroup>
-                              <CommandList>
-                                <ScrollArea viewportClassName="max-h-32">
-                                  {openPositionsSymbols.map((symbol) => (
-                                    <CommandItem
-                                      value={symbol}
-                                      key={symbol}
-                                      onSelect={() => {
-                                        form.setValue('symbol', symbol)
+      {apiKey.length > 0 && secretKey.length > 0 ? (
+        <>
+          <Form {...form}>
+            <form onSubmit={handleSubmit(handleFilter)} ref={formRef}>
+              <Label>Filters</Label>
+              <div className="my-2 flex gap-2.5">
+                <FormField
+                  control={form.control}
+                  name="symbol"
+                  render={({ field }) => (
+                    <FormItem className="relative flex flex-col">
+                      <Popover
+                        open={openSymbolFilter}
+                        onOpenChange={setOpenSymbolFilter}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                'justify-between w-40',
+                                !field.value && 'text-muted-foreground',
+                              )}
+                            >
+                              {field.value
+                                ? openPositionsSymbols.find(
+                                    (symbol) => symbol === field.value,
+                                  )
+                                : 'Select symbol'}
+                              <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-40 p-0">
+                          <Command>
+                            {isPendingPositions ? (
+                              <div className="mx-auto flex items-center gap-2 py-3">
+                                <Spinner />
+                                <span className="text-sm">
+                                  Loading currencies...
+                                </span>
+                              </div>
+                            ) : (
+                              <>
+                                <CommandInput placeholder="Search symbol..." />
+                                <CommandEmpty>No symbol found.</CommandEmpty>
+                                <CommandGroup>
+                                  <CommandList>
+                                    <ScrollArea viewportClassName="max-h-32">
+                                      {openPositionsSymbols.map((symbol) => (
+                                        <CommandItem
+                                          value={symbol}
+                                          key={symbol}
+                                          onSelect={() => {
+                                            form.setValue('symbol', symbol)
 
-                                        if (formRef && formRef.current) {
-                                          formRef.current.requestSubmit()
-                                        }
+                                            if (formRef && formRef.current) {
+                                              formRef.current.requestSubmit()
+                                            }
 
-                                        setOpenSymbolFilter(false)
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          symbol === field.value
-                                            ? 'opacity-100'
-                                            : 'opacity-0',
-                                        )}
-                                      />
-                                      {symbol}
-                                    </CommandItem>
-                                  ))}
-                                </ScrollArea>
-                              </CommandList>
-                            </CommandGroup>
-                          </>
-                        )}
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                                            setOpenSymbolFilter(false)
+                                          }}
+                                        >
+                                          <Check
+                                            className={cn(
+                                              'mr-2 h-4 w-4',
+                                              symbol === field.value
+                                                ? 'opacity-100'
+                                                : 'opacity-0',
+                                            )}
+                                          />
+                                          {symbol}
+                                        </CommandItem>
+                                      ))}
+                                    </ScrollArea>
+                                  </CommandList>
+                                </CommandGroup>
+                              </>
+                            )}
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    data-has-filter={!!form.getValues('symbol')}
-                    className="invisible absolute -right-2 -top-4 size-6 rounded-full data-[has-filter=true]:visible"
-                    onClick={() => {
-                      form.setValue('symbol', undefined)
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        data-has-filter={!!form.getValues('symbol')}
+                        className="invisible absolute -right-2 -top-4 size-6 rounded-full data-[has-filter=true]:visible"
+                        onClick={() => {
+                          form.setValue('symbol', undefined)
 
-                      if (formRef && formRef.current) {
-                        formRef.current.requestSubmit()
-                      }
-                    }}
-                  >
-                    <X className="size-4" />
-                  </Button>
+                          if (formRef && formRef.current) {
+                            formRef.current.requestSubmit()
+                          }
+                        }}
+                      >
+                        <X className="size-4" />
+                      </Button>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="side"
-              render={({ field }) => (
-                <FormItem className="relative flex flex-col">
-                  <Popover
-                    open={openSideFilter}
-                    onOpenChange={setOpenSideFilter}
-                  >
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            'justify-between w-40',
-                            !field.value && 'text-muted-foreground',
-                          )}
-                        >
-                          {field.value
-                            ? sides.find((side) => side === field.value)
-                            : 'Select side'}
-                          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-40 p-0">
-                      <Command>
-                        <CommandList>
-                          <CommandGroup>
-                            {sides.map((side) => (
-                              <CommandItem
-                                value={side}
-                                key={side}
-                                onSelect={() => {
-                                  form.setValue('side', side)
-
-                                  if (formRef && formRef.current) {
-                                    formRef.current.requestSubmit()
-                                  }
-
-                                  setOpenSideFilter(false)
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    'mr-2 h-4 w-4',
-                                    side === field.value
-                                      ? 'opacity-100'
-                                      : 'opacity-0',
-                                  )}
-                                />
-                                {side}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    data-has-filter={!!form.getValues('side')}
-                    className="invisible absolute -right-2 -top-4 size-6 rounded-full data-[has-filter=true]:visible"
-                    onClick={() => {
-                      form.setValue('side', undefined)
-
-                      if (formRef && formRef.current) {
-                        formRef.current.requestSubmit()
-                      }
-                    }}
-                  >
-                    <X className="size-4" />
-                  </Button>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex flex-1 justify-end pr-3">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="rounded-full"
-                onClick={handleRefreshPositions}
-              >
-                <RefreshCcw
-                  className={cn(
-                    'size-4',
-                    isFetchingPositions && 'animate-spin',
+                      <FormMessage />
+                    </FormItem>
                   )}
                 />
-              </Button>
-            </div>
-          </div>
-        </form>
-      </Form>
-      <ScrollArea className="flex h-96 w-full flex-col gap-3 pr-3">
-        {isPendingPositions ? (
-          <div className="flex w-full items-center justify-center">
-            <Spinner className="mt-32 size-10" />
-          </div>
-        ) : filteredPositions && filteredPositions.length > 0 ? (
-          <Table className="relative rounded-2xl" hasWrapper={false}>
-            <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-200 dark:bg-slate-800">
-              <TableRow>
-                <TableHead className="w-56">Symbol</TableHead>
-                <TableHead className="w-52">Side</TableHead>
-                <TableHead className="w-72">Entry Price</TableHead>
-                <TableHead className="w-56 text-right">Size</TableHead>
-                <TableHead className="w-96 space-x-2 text-center">
-                  <span>Close all:</span>
+
+                <FormField
+                  control={form.control}
+                  name="side"
+                  render={({ field }) => (
+                    <FormItem className="relative flex flex-col">
+                      <Popover
+                        open={openSideFilter}
+                        onOpenChange={setOpenSideFilter}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                'justify-between w-40',
+                                !field.value && 'text-muted-foreground',
+                              )}
+                            >
+                              {field.value
+                                ? sides.find((side) => side === field.value)
+                                : 'Select side'}
+                              <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-40 p-0">
+                          <Command>
+                            <CommandList>
+                              <CommandGroup>
+                                {sides.map((side) => (
+                                  <CommandItem
+                                    value={side}
+                                    key={side}
+                                    onSelect={() => {
+                                      form.setValue('side', side)
+
+                                      if (formRef && formRef.current) {
+                                        formRef.current.requestSubmit()
+                                      }
+
+                                      setOpenSideFilter(false)
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        'mr-2 h-4 w-4',
+                                        side === field.value
+                                          ? 'opacity-100'
+                                          : 'opacity-0',
+                                      )}
+                                    />
+                                    {side}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        data-has-filter={!!form.getValues('side')}
+                        className="invisible absolute -right-2 -top-4 size-6 rounded-full data-[has-filter=true]:visible"
+                        onClick={() => {
+                          form.setValue('side', undefined)
+
+                          if (formRef && formRef.current) {
+                            formRef.current.requestSubmit()
+                          }
+                        }}
+                      >
+                        <X className="size-4" />
+                      </Button>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex flex-1 justify-end pr-3">
                   <Button
                     type="button"
-                    variant="link"
-                    disabled={isPendingNewOrder}
-                    onClick={handleCloseAll}
-                    className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    onClick={handleRefreshPositions}
                   >
-                    {isPendingNewOrder ? <Spinner /> : <span>Market</span>}
-                  </Button>
-
-                  <Separator
-                    orientation="vertical"
-                    className="inline-block h-4"
-                  />
-
-                  {isPendingSymbolsPrices ? (
-                    <Spinner className="mb-1.5 inline-block size-3" />
-                  ) : (
-                    <CloseAllLimitPopover
-                      symbolsInformation={filteredPositions.map((position) => {
-                        const symbolData = symbols?.find(
-                          (item) => item.symbol === position.symbol,
-                        )
-
-                        const symbolInformation: SymbolInformation = {
-                          symbol: position.symbol,
-                          quantity: roundToDecimals(
-                            Math.abs(Number(position.positionAmt)),
-                            symbolData ? symbolData.quantityPrecision : 2,
-                          ),
-                          quantityPrecision: symbolData
-                            ? symbolData.quantityPrecision
-                            : 2,
-                          side: getPositionSide(Number(position.notional)),
-                          price: prices[position.symbol] ?? 0.5,
-                        }
-
-                        return symbolInformation
-                      })}
-                      handleSubmit={handleCloseAllLimit}
-                      isPending={isPendingNewOrder || isPendingPositions}
-                      open={openCloseAllLimitPopover}
-                      setOpen={setOpenCloseAllLimitPopover}
+                    <RefreshCcw
+                      className={cn(
+                        'size-4',
+                        isFetchingPositions && 'animate-spin',
+                      )}
                     />
-                  )}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPositions
-                .sort(
-                  (positionA, positionB) =>
-                    convertPriceToUsdt(
-                      Number(positionB.positionAmt),
-                      prices[positionB.symbol] ?? 0,
-                    ) -
-                    convertPriceToUsdt(
-                      Number(positionA.positionAmt),
-                      prices[positionA.symbol] ?? 0,
-                    ),
-                )
-                .map((position, index) => {
-                  const positionSide = getPositionSide(
-                    Number(position.notional),
-                  )
-                  const symbolData = symbols?.find(
-                    (item) => item.symbol === position.symbol,
-                  )
-                  return (
-                    <TableRow key={index}>
-                      <TableCell className="flex gap-1.5 font-medium">
-                        <span>{position.symbol}</span>
-                        <span className="rounded bg-slate-200 px-1 text-yellow-600 dark:bg-slate-800 dark:text-yellow-400">{`${position.leverage}x`}</span>
-                      </TableCell>
-                      <TableCell
-                        data-long={positionSide === 'LONG'}
-                        data-short={positionSide === 'SHORT'}
-                        className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </Form>
+          <ScrollArea className="flex h-96 w-full flex-col gap-3 pr-3">
+            {isPendingPositions ? (
+              <div className="flex w-full items-center justify-center">
+                <Spinner className="mt-32 size-10" />
+              </div>
+            ) : filteredPositions && filteredPositions.length > 0 ? (
+              <Table className="relative rounded-2xl" hasWrapper={false}>
+                <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-200 dark:bg-slate-800">
+                  <TableRow>
+                    <TableHead className="w-56">Symbol</TableHead>
+                    <TableHead className="w-52">Side</TableHead>
+                    <TableHead className="w-72">Entry Price</TableHead>
+                    <TableHead className="w-56 text-right">Size</TableHead>
+                    <TableHead className="w-96 space-x-2 text-center">
+                      <span>Close all:</span>
+                      <Button
+                        type="button"
+                        variant="link"
+                        disabled={isPendingNewOrder}
+                        onClick={handleCloseAll}
+                        className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
                       >
-                        {positionSide}
-                      </TableCell>
-                      <TableCell>
-                        {Number(position.entryPrice).toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {`$ ${convertPriceToUsdt(
-                          Number(position.positionAmt),
-                          prices[position.symbol] ?? 0,
-                        ).toFixed(2)}`}
-                      </TableCell>
-                      <TableCell className="flex justify-center gap-2 text-center">
-                        <Button
-                          type="button"
-                          variant="link"
-                          disabled={isPendingNewOrder}
-                          onClick={() => {
-                            handleCloseMarket(position)
-                          }}
-                          className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
-                        >
-                          Market
-                        </Button>
+                        {isPendingNewOrder ? <Spinner /> : <span>Market</span>}
+                      </Button>
 
-                        <Separator orientation="vertical" className="h-4" />
+                      <Separator
+                        orientation="vertical"
+                        className="inline-block h-4"
+                      />
 
-                        {symbolData && (
-                          <CloseLimitPopover
-                            quantity={roundToDecimals(
-                              Math.abs(Number(position.positionAmt)),
-                              symbolData.quantityPrecision,
-                            )}
-                            symbol={position.symbol}
-                            handleSubmit={handleCloseLimit}
-                            side={getPositionSide(Number(position.notional))}
-                            isPending={isPendingNewOrder}
-                            quantityPrecision={symbolData.quantityPrecision}
-                          />
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-            </TableBody>
-            <TableFooter className="sticky -bottom-px z-10 translate-y-px bg-slate-200 dark:bg-slate-800">
-              <TableRow>
-                <TableCell colSpan={4}>Total (USDT)</TableCell>
-                <TableCell className="text-right">
-                  <span className="mr-1">$</span>
-                  {isPendingSymbolsPrices
-                    ? '...'
-                    : filteredPositions
-                        .reduce(
-                          (total, position) =>
-                            total +
-                            convertPriceToUsdt(
+                      {isPendingSymbolsPrices ? (
+                        <Spinner className="mb-1.5 inline-block size-3" />
+                      ) : (
+                        <CloseAllLimitPopover
+                          symbolsInformation={filteredPositions.map(
+                            (position) => {
+                              const symbolData = symbols?.find(
+                                (item) => item.symbol === position.symbol,
+                              )
+
+                              const symbolInformation: SymbolInformation = {
+                                symbol: position.symbol,
+                                quantity: roundToDecimals(
+                                  Math.abs(Number(position.positionAmt)),
+                                  symbolData ? symbolData.quantityPrecision : 2,
+                                ),
+                                quantityPrecision: symbolData
+                                  ? symbolData.quantityPrecision
+                                  : 2,
+                                side: getPositionSide(
+                                  Number(position.notional),
+                                ),
+                                price: prices[position.symbol] ?? 0.5,
+                              }
+
+                              return symbolInformation
+                            },
+                          )}
+                          handleSubmit={handleCloseAllLimit}
+                          isPending={isPendingNewOrder || isPendingPositions}
+                          open={openCloseAllLimitPopover}
+                          setOpen={setOpenCloseAllLimitPopover}
+                        />
+                      )}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredPositions
+                    .sort(
+                      (positionA, positionB) =>
+                        convertPriceToUsdt(
+                          Number(positionB.positionAmt),
+                          prices[positionB.symbol] ?? 0,
+                        ) -
+                        convertPriceToUsdt(
+                          Number(positionA.positionAmt),
+                          prices[positionA.symbol] ?? 0,
+                        ),
+                    )
+                    .map((position, index) => {
+                      const positionSide = getPositionSide(
+                        Number(position.notional),
+                      )
+                      const symbolData = symbols?.find(
+                        (item) => item.symbol === position.symbol,
+                      )
+                      return (
+                        <TableRow key={index}>
+                          <TableCell className="flex gap-1.5 font-medium">
+                            <span>{position.symbol}</span>
+                            <span className="rounded bg-slate-200 px-1 text-yellow-600 dark:bg-slate-800 dark:text-yellow-400">{`${position.leverage}x`}</span>
+                          </TableCell>
+                          <TableCell
+                            data-long={positionSide === 'LONG'}
+                            data-short={positionSide === 'SHORT'}
+                            className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
+                          >
+                            {positionSide}
+                          </TableCell>
+                          <TableCell>
+                            {Number(position.entryPrice).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {`$ ${convertPriceToUsdt(
                               Number(position.positionAmt),
                               prices[position.symbol] ?? 0,
-                            ),
-                          0,
-                        )
-                        .toFixed(2)}
-                </TableCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
-        ) : (
-          <div className="text-center">
-            <Label>
-              There are no open positions or <br />
-              no open positions matches your filters.
-            </Label>
-          </div>
-        )}
-      </ScrollArea>
+                            ).toFixed(2)}`}
+                          </TableCell>
+                          <TableCell className="flex justify-center gap-2 text-center">
+                            <Button
+                              type="button"
+                              variant="link"
+                              disabled={isPendingNewOrder}
+                              onClick={() => {
+                                handleCloseMarket(position)
+                              }}
+                              className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
+                            >
+                              Market
+                            </Button>
+
+                            <Separator orientation="vertical" className="h-4" />
+
+                            {symbolData && (
+                              <CloseLimitPopover
+                                quantity={roundToDecimals(
+                                  Math.abs(Number(position.positionAmt)),
+                                  symbolData.quantityPrecision,
+                                )}
+                                symbol={position.symbol}
+                                handleSubmit={handleCloseLimit}
+                                side={getPositionSide(
+                                  Number(position.notional),
+                                )}
+                                isPending={isPendingNewOrder}
+                                quantityPrecision={symbolData.quantityPrecision}
+                              />
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                </TableBody>
+                <TableFooter className="sticky -bottom-px z-10 translate-y-px bg-slate-200 dark:bg-slate-800">
+                  <TableRow>
+                    <TableCell colSpan={4}>Total (USDT)</TableCell>
+                    <TableCell className="text-right">
+                      <span className="mr-1">$</span>
+                      {isPendingSymbolsPrices
+                        ? '...'
+                        : filteredPositions
+                            .reduce(
+                              (total, position) =>
+                                total +
+                                convertPriceToUsdt(
+                                  Number(position.positionAmt),
+                                  prices[position.symbol] ?? 0,
+                                ),
+                              0,
+                            )
+                            .toFixed(2)}
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            ) : (
+              <div className="text-center">
+                <Label>
+                  There are no open positions or <br />
+                  no open positions matches your filters.
+                </Label>
+              </div>
+            )}
+          </ScrollArea>
+        </>
+      ) : (
+        <SetCredentialsKeysWarning />
+      )}
     </>
   )
 }
