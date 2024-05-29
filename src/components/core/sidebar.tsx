@@ -15,7 +15,7 @@ export function Sidebar() {
   const paths = pathname.split('/')
 
   return (
-    <aside className="fixed left-0 z-30 hidden h-screen w-72 flex-col space-y-6 border-r border-border lg:flex">
+    <aside className="fixed left-0 z-30 hidden h-screen w-72 flex-col space-y-6 border-r border-border xl:flex">
       <header className="flex select-none items-center gap-3 border-b border-border p-6">
         <Image src={Logo} alt="Pocket Trader's logo." width={24} height={24} />
         <h1 className="text-xl font-semibold">

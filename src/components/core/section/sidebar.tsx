@@ -12,7 +12,7 @@ export function SectionSidebar({ navItems, className, ...props }: Props) {
   const pathname = usePathname()
 
   return (
-    <aside className={cn('hidden lg:block', className)} {...props}>
+    <aside className={cn('hidden xl:block', className)} {...props}>
       <nav className="flex flex-col gap-2">
         {navItems.map(({ title, href, icon: Icon }) => (
           <Link

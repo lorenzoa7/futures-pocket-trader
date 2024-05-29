@@ -1,6 +1,5 @@
 'use client'
 
-import { GetPositionResponse, Position } from '@/api/get-positions'
 import { SetCredentialsKeysWarning } from '@/components/core/set-credentials-keys-warning'
 import { Button } from '@/components/ui/button'
 import {
@@ -39,23 +38,11 @@ import {
 import { sides } from '@/config/currency'
 import { convertPriceToUsdt } from '@/functions/convert-price-to-usdt'
 import { getPositionSide } from '@/functions/get-position-side'
-import { mergeObjects } from '@/functions/merge-objects'
-import { resolveError } from '@/functions/resolve-error'
 import { roundToDecimals } from '@/functions/round-to-decimals'
 import { useAccountStore } from '@/hooks/store/use-account-store'
 import { cn } from '@/lib/utils'
-import { CloseAllLimitSchema } from '@/schemas/close-all-limit-schema'
-import {
-  InformationFilterSchema,
-  informationFilterSchema,
-} from '@/schemas/information-filter-schema'
-import { SingleOrderSchema } from '@/schemas/single-order-schema'
-import { trpc } from '@/server/client'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown, RefreshCcw, X } from 'lucide-react'
-import { useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { usePositionsLogic } from '../_hooks/use-positions-logic'
 import {
   CloseAllLimitPopover,
   SymbolInformation,
@@ -63,261 +50,63 @@ import {
 import { CloseLimitPopover } from './close-limit-popover'
 
 export function PositionsTable() {
-  const trpcUtils = trpc.useUtils()
-  const { apiKey, isTestnetAccount, secretKey } = useAccountStore()
+  const { apiKey, secretKey } = useAccountStore()
   const {
-    data: positions,
-    isPending: isPendingPositions,
-    isFetching: isFetchingPositions,
-  } = trpc.getPositions.useQuery(
-    { apiKey, secretKey, isTestnetAccount },
-    {
-      enabled: apiKey.length > 0 && secretKey.length > 0,
-      select: (data: GetPositionResponse | undefined) => {
-        return data?.filter((position) => Number(position.entryPrice) > 0)
-      },
-    },
-  )
-
-  const { data: symbols } = trpc.getSymbols.useQuery({ isTestnetAccount })
-
-  const { mutateAsync: newOrder, isPending: isPendingNewOrder } =
-    trpc.newOrder.useMutation({
-      onSuccess: async (_, variables) => {
-        if (variables.shouldRefetch) {
-          await Promise.all([
-            // TODO: invalidate get orders
-            trpcUtils.getPositions.invalidate(),
-          ])
-        }
-      },
-    })
-
-  const [filter, setFilter] = useState<InformationFilterSchema>({
-    side: undefined,
-    symbol: undefined,
-  })
-  const [openCloseAllLimitPopover, setOpenCloseAllLimitPopover] =
-    useState(false)
-
-  const filteredPositions = positions?.filter(
-    (position) =>
-      (!filter.symbol || filter.symbol === position.symbol) &&
-      (!filter.side ||
-        filter.side === getPositionSide(Number(position.notional))),
-  )
-
-  const positionSymbols = filteredPositions
-    ? [...new Set(filteredPositions.map((position) => position.symbol))]
-    : []
-
-  const symbolsPricesQueries = trpc.useQueries((t) =>
-    positionSymbols.map((symbol) =>
-      t.getSymbolPrice(
-        { symbol, isTestnetAccount },
-        {
-          enabled: positionSymbols.length > 0,
-          select: (data: number | undefined) => {
-            return { [symbol]: data }
-          },
-        },
-      ),
-    ),
-  )
-
-  const prices = mergeObjects(
-    ...symbolsPricesQueries.map((result) => result.data ?? {}),
-  )
-  const isPendingSymbolsPrices = symbolsPricesQueries.some(
-    (result) => result.isPending,
-  )
-
-  const openPositionsSymbols = positions
-    ? positions.map((position) => position.symbol)
-    : []
-
-  const form = useForm<InformationFilterSchema>({
-    resolver: zodResolver(informationFilterSchema),
-  })
-  const { handleSubmit, setValue } = form
-
-  const handleFilter = (data: InformationFilterSchema) => {
-    setFilter(data)
-  }
-
-  const handleCloseAll = async () => {
-    const dataList: Omit<SingleOrderSchema, 'price'>[] =
-      positions?.map((position) => ({
-        symbol: position.symbol,
-        isUsdtQuantity: false,
-        quantity: Math.abs(Number(position.positionAmt)),
-        side:
-          getPositionSide(Number(position.notional)) === 'LONG'
-            ? 'SELL'
-            : 'BUY',
-      })) ?? []
-
-    const promises = dataList.map((data) =>
-      newOrder({
-        noErrorMessage: true,
-        api: {
-          apiKey,
-          isTestnetAccount,
-          secretKey,
-          type: 'MARKET',
-          data,
-        },
-      }),
-    )
-
-    try {
-      await Promise.all(promises)
-
-      await Promise.all([
-        // TODO: invalidate get orders
-        trpcUtils.getPositions.invalidate(),
-      ])
-
-      toast.success('Close market order created successfully!')
-    } catch (error) {
-      toast.error("Couldn't create a close market order.", {
-        description: error as string,
-      })
-    }
-  }
-
-  const handleCloseMarket = async (position: Position) => {
-    const data: Omit<SingleOrderSchema, 'price'> = {
-      symbol: position.symbol,
-      isUsdtQuantity: false,
-      quantity: Math.abs(Number(position.positionAmt)),
-      side:
-        getPositionSide(Number(position.notional)) === 'LONG' ? 'SELL' : 'BUY',
-    }
-
-    try {
-      await newOrder({
-        shouldRefetch: true,
-        api: {
-          apiKey,
-          isTestnetAccount,
-          secretKey,
-          type: 'MARKET',
-          data,
-        },
-      })
-
-      toast.success('Close market order created successfully!')
-    } catch (error) {
-      resolveError(error, "Couldn't create a close market order.")
-    }
-  }
-
-  const handleCloseLimit = async (data: SingleOrderSchema) => {
-    const symbolData = symbols?.find((item) => item.symbol === data.symbol)
-    const precision = symbolData && {
-      quantity: symbolData.quantityPrecision,
-      price: symbolData.pricePrecision,
-      baseAsset: symbolData.baseAssetPrecision,
-      quote: symbolData.quotePrecision,
-    }
-
-    data.quantity = roundToDecimals(data.quantity, precision?.quantity || 0)
-    data.price = roundToDecimals(data.price, precision?.price || 0)
-
-    try {
-      await newOrder({
-        noErrorMessage: true,
-        shouldRefetch: true,
-        api: {
-          apiKey,
-          isTestnetAccount,
-          secretKey,
-          type: 'LIMIT',
-          data,
-        },
-      })
-      toast.success('Close limit order created successfully!')
-    } catch (error) {
-      toast.error("Couldn't create a close limit order.", {
-        description: error as string,
-      })
-    }
-  }
-
-  const handleCloseAllLimit = async ({ orders }: CloseAllLimitSchema) => {
-    const promises = orders.map(async (data) => {
-      const symbolData = symbols?.find((item) => item.symbol === data.symbol)
-      const precision = symbolData && {
-        quantity: symbolData.quantityPrecision,
-        price: symbolData.pricePrecision,
-        baseAsset: symbolData.baseAssetPrecision,
-        quote: symbolData.quotePrecision,
-      }
-
-      if (!precision) {
-        toast.error('Something went wrong. Check the parameters and try again!')
-        return
-      }
-
-      data.quantity = roundToDecimals(data.quantity, precision.quantity)
-
-      const correctedPrice =
-        data.price - (data.price % Number(symbolData.filters[0].tickSize))
-      data.price = roundToDecimals(correctedPrice, precision.price)
-
-      return newOrder({
-        noErrorMessage: true,
-        api: {
-          apiKey,
-          isTestnetAccount,
-          secretKey,
-          type: 'LIMIT',
-          data,
-        },
-      })
-    })
-
-    try {
-      await Promise.all(promises)
-      await Promise.all([
-        // TODO: invalidate get orders
-        trpcUtils.getPositions.invalidate(),
-      ])
-
-      setOpenCloseAllLimitPopover(false)
-      toast.success('Close all limit orders created successfully!')
-    } catch (error) {
-      setOpenCloseAllLimitPopover(false)
-      toast.error("Couldn't create a new order.", {
-        description: error as string,
-      })
-    }
-  }
-
-  const handleRefreshPositions = () => {
-    setValue('symbol', undefined)
-    setValue('side', undefined)
-    trpcUtils.getPositions.invalidate()
-  }
-
-  const formRef = useRef<HTMLFormElement>(null)
-  const [openSymbolFilter, setOpenSymbolFilter] = useState(false)
-  const [openSideFilter, setOpenSideFilter] = useState(false)
+    handleCloseAll,
+    handleCloseAllLimit,
+    handleCloseLimit,
+    handleCloseMarket,
+    isPendingNewOrder,
+    isPendingPositions,
+    isPendingSymbolsPrices,
+    filteredPositions,
+    symbols,
+    openCloseAllLimitPopover,
+    prices,
+    setOpenCloseAllLimitPopover,
+    form,
+    handleFilter,
+    handleSubmit,
+    formRef,
+    openSideFilter,
+    openSymbolFilter,
+    setOpenSideFilter,
+    setOpenSymbolFilter,
+    openPositionsSymbols,
+    handleRefreshPositions,
+    isFetchingPositions,
+  } = usePositionsLogic()
 
   return (
     <>
       {apiKey.length > 0 && secretKey.length > 0 ? (
         <>
+          {/* Form  */}
           <Form {...form}>
             <form onSubmit={handleSubmit(handleFilter)} ref={formRef}>
-              <Label>Filters</Label>
-              <div className="my-2 flex gap-2.5">
+              <div className="flex w-full items-center justify-between">
+                <Label>Filters</Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full lg:hidden"
+                  onClick={handleRefreshPositions}
+                >
+                  <RefreshCcw
+                    className={cn(
+                      'size-4',
+                      isFetchingPositions && 'animate-spin',
+                    )}
+                  />
+                </Button>
+              </div>
+              <div className="mb-2 mt-0 flex gap-1 lg:my-2 lg:gap-2.5">
                 <FormField
                   control={form.control}
                   name="symbol"
                   render={({ field }) => (
-                    <FormItem className="relative flex flex-col">
+                    <FormItem className="relative flex w-full flex-col lg:w-fit">
                       <Popover
                         open={openSymbolFilter}
                         onOpenChange={setOpenSymbolFilter}
@@ -328,7 +117,7 @@ export function PositionsTable() {
                               variant="outline"
                               role="combobox"
                               className={cn(
-                                'justify-between w-40',
+                                'justify-between lg:w-40 w-full sm:text-sm text-xs',
                                 !field.value && 'text-muted-foreground',
                               )}
                             >
@@ -341,7 +130,7 @@ export function PositionsTable() {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-40 p-0">
+                        <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
                           <Command>
                             {isPendingPositions ? (
                               <div className="mx-auto flex items-center gap-2 py-3">
@@ -352,7 +141,10 @@ export function PositionsTable() {
                               </div>
                             ) : (
                               <>
-                                <CommandInput placeholder="Search symbol..." />
+                                <CommandInput
+                                  placeholder="Search symbol..."
+                                  className="text-xs sm:text-sm"
+                                />
                                 <CommandEmpty>No symbol found.</CommandEmpty>
                                 <CommandGroup>
                                   <CommandList>
@@ -417,7 +209,7 @@ export function PositionsTable() {
                   control={form.control}
                   name="side"
                   render={({ field }) => (
-                    <FormItem className="relative flex flex-col">
+                    <FormItem className="relative flex w-full flex-col lg:w-fit">
                       <Popover
                         open={openSideFilter}
                         onOpenChange={setOpenSideFilter}
@@ -428,7 +220,7 @@ export function PositionsTable() {
                               variant="outline"
                               role="combobox"
                               className={cn(
-                                'justify-between w-40',
+                                'justify-between lg:w-40 w-full sm:text-sm text-xs',
                                 !field.value && 'text-muted-foreground',
                               )}
                             >
@@ -439,7 +231,7 @@ export function PositionsTable() {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-40 p-0">
+                        <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
                           <Command>
                             <CommandList>
                               <CommandGroup>
@@ -496,7 +288,7 @@ export function PositionsTable() {
                   )}
                 />
 
-                <div className="flex flex-1 justify-end pr-3">
+                <div className="hidden flex-1 justify-end pr-3 lg:flex">
                   <Button
                     type="button"
                     variant="ghost"
@@ -515,74 +307,66 @@ export function PositionsTable() {
               </div>
             </form>
           </Form>
-          <ScrollArea className="flex h-96 w-full flex-col gap-3 pr-3">
+
+          {/* Content  */}
+          <ScrollArea className="mt-4 flex w-full flex-col gap-3 lg:mt-0 lg:h-96 lg:pr-3">
             {isPendingPositions ? (
               <div className="flex w-full items-center justify-center">
                 <Spinner className="mt-32 size-10" />
               </div>
             ) : filteredPositions && filteredPositions.length > 0 ? (
-              <Table className="relative rounded-2xl" hasWrapper={false}>
-                <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-200 dark:bg-slate-800">
-                  <TableRow>
-                    <TableHead className="w-56">Symbol</TableHead>
-                    <TableHead className="w-52">Side</TableHead>
-                    <TableHead className="w-72">Entry Price</TableHead>
-                    <TableHead className="w-56 text-right">Size</TableHead>
-                    <TableHead className="w-96 space-x-2 text-center">
-                      <span>Close all:</span>
-                      <Button
-                        type="button"
-                        variant="link"
-                        disabled={isPendingNewOrder}
-                        onClick={handleCloseAll}
-                        className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
-                      >
-                        {isPendingNewOrder ? <Spinner /> : <span>Market</span>}
-                      </Button>
-
-                      <Separator
-                        orientation="vertical"
-                        className="inline-block h-4"
-                      />
-
-                      {isPendingSymbolsPrices ? (
-                        <Spinner className="mb-1.5 inline-block size-3" />
+              <>
+                <div className="flex flex-col gap-2 lg:hidden">
+                  <Label>Positions</Label>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="brand"
+                      disabled={isPendingNewOrder}
+                      onClick={handleCloseAll}
+                      className="flex-1"
+                    >
+                      {isPendingNewOrder ? (
+                        <Spinner />
                       ) : (
-                        <CloseAllLimitPopover
-                          symbolsInformation={filteredPositions.map(
-                            (position) => {
-                              const symbolData = symbols?.find(
-                                (item) => item.symbol === position.symbol,
-                              )
-
-                              const symbolInformation: SymbolInformation = {
-                                symbol: position.symbol,
-                                quantity: roundToDecimals(
-                                  Math.abs(Number(position.positionAmt)),
-                                  symbolData ? symbolData.quantityPrecision : 2,
-                                ),
-                                quantityPrecision: symbolData
-                                  ? symbolData.quantityPrecision
-                                  : 2,
-                                side: getPositionSide(
-                                  Number(position.notional),
-                                ),
-                                price: prices[position.symbol] ?? 0.5,
-                              }
-
-                              return symbolInformation
-                            },
-                          )}
-                          handleSubmit={handleCloseAllLimit}
-                          isPending={isPendingNewOrder || isPendingPositions}
-                          open={openCloseAllLimitPopover}
-                          setOpen={setOpenCloseAllLimitPopover}
-                        />
+                        <span>Close all (market)</span>
                       )}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+                    </Button>
+
+                    {isPendingSymbolsPrices ? (
+                      <Spinner className="mb-1.5 inline-block size-3" />
+                    ) : (
+                      <CloseAllLimitPopover
+                        symbolsInformation={filteredPositions.map(
+                          (position) => {
+                            const symbolData = symbols?.find(
+                              (item) => item.symbol === position.symbol,
+                            )
+
+                            const symbolInformation: SymbolInformation = {
+                              symbol: position.symbol,
+                              quantity: roundToDecimals(
+                                Math.abs(Number(position.positionAmt)),
+                                symbolData ? symbolData.quantityPrecision : 2,
+                              ),
+                              quantityPrecision: symbolData
+                                ? symbolData.quantityPrecision
+                                : 2,
+                              side: getPositionSide(Number(position.notional)),
+                              price: prices[position.symbol] ?? 0.5,
+                            }
+
+                            return symbolInformation
+                          },
+                        )}
+                        handleSubmit={handleCloseAllLimit}
+                        isPending={isPendingNewOrder || isPendingPositions}
+                        open={openCloseAllLimitPopover}
+                        setOpen={setOpenCloseAllLimitPopover}
+                      />
+                    )}
+                  </div>
                   {filteredPositions
                     .sort(
                       (positionA, positionB) =>
@@ -603,41 +387,54 @@ export function PositionsTable() {
                         (item) => item.symbol === position.symbol,
                       )
                       return (
-                        <TableRow key={index}>
-                          <TableCell className="flex gap-1.5 font-medium">
-                            <span>{position.symbol}</span>
-                            <span className="rounded bg-slate-200 px-1 text-yellow-600 dark:bg-slate-800 dark:text-yellow-400">{`${position.leverage}x`}</span>
-                          </TableCell>
-                          <TableCell
-                            data-long={positionSide === 'LONG'}
-                            data-short={positionSide === 'SHORT'}
-                            className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
-                          >
-                            {positionSide}
-                          </TableCell>
-                          <TableCell>
-                            {Number(position.entryPrice).toFixed(2)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {`$ ${convertPriceToUsdt(
-                              Number(position.positionAmt),
-                              prices[position.symbol] ?? 0,
-                            ).toFixed(2)}`}
-                          </TableCell>
-                          <TableCell className="flex justify-center gap-2 text-center">
+                        <div
+                          key={index}
+                          className="flex w-full items-center justify-between rounded-lg border-2 border-border p-3 text-sm"
+                        >
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <span>{position.symbol}</span>
+                              <span className="rounded bg-slate-200 px-1 text-yellow-600 dark:bg-slate-800 dark:text-yellow-400">{`${position.leverage}x`}</span>
+                            </div>
+
+                            <span className="text-lg font-bold">
+                              {`$ ${convertPriceToUsdt(
+                                Number(position.positionAmt),
+                                prices[position.symbol] ?? 0,
+                              ).toFixed(2)}`}
+                            </span>
+
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium">Side: </span>
+                              <span
+                                data-long={positionSide === 'LONG'}
+                                data-short={positionSide === 'SHORT'}
+                                className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
+                              >
+                                {positionSide}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium">Entry Price: </span>
+                              <span>
+                                {Number(position.entryPrice).toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex h-full flex-col gap-2">
                             <Button
                               type="button"
-                              variant="link"
+                              size="sm"
+                              variant="brand"
                               disabled={isPendingNewOrder}
                               onClick={() => {
                                 handleCloseMarket(position)
                               }}
-                              className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
+                              className="text-xs sm:text-sm"
                             >
-                              Market
+                              Close market
                             </Button>
-
-                            <Separator orientation="vertical" className="h-4" />
 
                             {symbolData && (
                               <CloseLimitPopover
@@ -654,33 +451,195 @@ export function PositionsTable() {
                                 quantityPrecision={symbolData.quantityPrecision}
                               />
                             )}
-                          </TableCell>
-                        </TableRow>
+                          </div>
+                        </div>
                       )
                     })}
-                </TableBody>
-                <TableFooter className="sticky -bottom-px z-10 translate-y-px bg-slate-200 dark:bg-slate-800">
-                  <TableRow>
-                    <TableCell colSpan={4}>Total (USDT)</TableCell>
-                    <TableCell className="text-right">
-                      <span className="mr-1">$</span>
-                      {isPendingSymbolsPrices
-                        ? '...'
-                        : filteredPositions
-                            .reduce(
-                              (total, position) =>
-                                total +
-                                convertPriceToUsdt(
-                                  Number(position.positionAmt),
-                                  prices[position.symbol] ?? 0,
-                                ),
-                              0,
-                            )
-                            .toFixed(2)}
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
-              </Table>
+                </div>
+                <Table
+                  className="relative hidden rounded-2xl lg:table"
+                  hasWrapper={false}
+                >
+                  <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-200 dark:bg-slate-800">
+                    <TableRow>
+                      <TableHead className="w-56">Symbol</TableHead>
+                      <TableHead className="w-52">Side</TableHead>
+                      <TableHead className="w-72">Entry Price</TableHead>
+                      <TableHead className="w-56 text-right">Size</TableHead>
+                      <TableHead className="w-96">
+                        <div className="flex flex-col gap-0.5 text-center">
+                          <span>Close all:</span>
+                          <div className="space-x-2">
+                            <Button
+                              type="button"
+                              variant="link"
+                              disabled={isPendingNewOrder}
+                              onClick={handleCloseAll}
+                              className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
+                            >
+                              {isPendingNewOrder ? (
+                                <Spinner />
+                              ) : (
+                                <span>Market</span>
+                              )}
+                            </Button>
+
+                            <Separator
+                              orientation="vertical"
+                              className="inline-block h-4"
+                            />
+
+                            {isPendingSymbolsPrices ? (
+                              <Spinner className="mb-1.5 inline-block size-3" />
+                            ) : (
+                              <CloseAllLimitPopover
+                                symbolsInformation={filteredPositions.map(
+                                  (position) => {
+                                    const symbolData = symbols?.find(
+                                      (item) => item.symbol === position.symbol,
+                                    )
+
+                                    const symbolInformation: SymbolInformation =
+                                      {
+                                        symbol: position.symbol,
+                                        quantity: roundToDecimals(
+                                          Math.abs(
+                                            Number(position.positionAmt),
+                                          ),
+                                          symbolData
+                                            ? symbolData.quantityPrecision
+                                            : 2,
+                                        ),
+                                        quantityPrecision: symbolData
+                                          ? symbolData.quantityPrecision
+                                          : 2,
+                                        side: getPositionSide(
+                                          Number(position.notional),
+                                        ),
+                                        price: prices[position.symbol] ?? 0.5,
+                                      }
+
+                                    return symbolInformation
+                                  },
+                                )}
+                                handleSubmit={handleCloseAllLimit}
+                                isPending={
+                                  isPendingNewOrder || isPendingPositions
+                                }
+                                open={openCloseAllLimitPopover}
+                                setOpen={setOpenCloseAllLimitPopover}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredPositions
+                      .sort(
+                        (positionA, positionB) =>
+                          convertPriceToUsdt(
+                            Number(positionB.positionAmt),
+                            prices[positionB.symbol] ?? 0,
+                          ) -
+                          convertPriceToUsdt(
+                            Number(positionA.positionAmt),
+                            prices[positionA.symbol] ?? 0,
+                          ),
+                      )
+                      .map((position, index) => {
+                        const positionSide = getPositionSide(
+                          Number(position.notional),
+                        )
+                        const symbolData = symbols?.find(
+                          (item) => item.symbol === position.symbol,
+                        )
+                        return (
+                          <TableRow key={index}>
+                            <TableCell className="flex gap-1.5 font-medium">
+                              <span>{position.symbol}</span>
+                              <span className="rounded bg-slate-200 px-1 text-yellow-600 dark:bg-slate-800 dark:text-yellow-400">{`${position.leverage}x`}</span>
+                            </TableCell>
+                            <TableCell
+                              data-long={positionSide === 'LONG'}
+                              data-short={positionSide === 'SHORT'}
+                              className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
+                            >
+                              {positionSide}
+                            </TableCell>
+                            <TableCell>
+                              {Number(position.entryPrice).toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {`$ ${convertPriceToUsdt(
+                                Number(position.positionAmt),
+                                prices[position.symbol] ?? 0,
+                              ).toFixed(2)}`}
+                            </TableCell>
+                            <TableCell className="flex justify-center gap-2 text-center">
+                              <Button
+                                type="button"
+                                variant="link"
+                                disabled={isPendingNewOrder}
+                                onClick={() => {
+                                  handleCloseMarket(position)
+                                }}
+                                className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
+                              >
+                                Market
+                              </Button>
+
+                              <Separator
+                                orientation="vertical"
+                                className="h-4"
+                              />
+
+                              {symbolData && (
+                                <CloseLimitPopover
+                                  quantity={roundToDecimals(
+                                    Math.abs(Number(position.positionAmt)),
+                                    symbolData.quantityPrecision,
+                                  )}
+                                  symbol={position.symbol}
+                                  handleSubmit={handleCloseLimit}
+                                  side={getPositionSide(
+                                    Number(position.notional),
+                                  )}
+                                  isPending={isPendingNewOrder}
+                                  quantityPrecision={
+                                    symbolData.quantityPrecision
+                                  }
+                                />
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                  </TableBody>
+                  <TableFooter className="sticky -bottom-px z-10 translate-y-px bg-slate-200 dark:bg-slate-800">
+                    <TableRow>
+                      <TableCell colSpan={4}>Total (USDT)</TableCell>
+                      <TableCell className="text-right">
+                        <span className="mr-1">$</span>
+                        {isPendingSymbolsPrices
+                          ? '...'
+                          : filteredPositions
+                              .reduce(
+                                (total, position) =>
+                                  total +
+                                  convertPriceToUsdt(
+                                    Number(position.positionAmt),
+                                    prices[position.symbol] ?? 0,
+                                  ),
+                                0,
+                              )
+                              .toFixed(2)}
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </>
             ) : (
               <div className="text-center">
                 <Label>

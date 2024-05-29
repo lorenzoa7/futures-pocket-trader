@@ -26,7 +26,7 @@ export function SidebarSheet() {
   const paths = pathname.split('/')
 
   return (
-    <header className="fixed left-0 z-30 flex w-full items-center justify-between border-b border-border bg-background px-4 lg:hidden">
+    <header className="fixed left-0 z-30 flex w-full items-center justify-between border-b border-border bg-background px-4 xl:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <button className="group flex select-none items-center justify-center gap-3 border-b border-border   py-6 duration-150">
@@ -42,7 +42,7 @@ export function SidebarSheet() {
                 width={24}
                 height={24}
               />
-              <h1 className="text-xl font-semibold">
+              <h1 className="text-base font-semibold xs:text-lg sm:text-xl">
                 <span className="text-amber-600 dark:text-amber-400">
                   futures
                 </span>{' '}
@@ -128,7 +128,7 @@ export function SidebarSheet() {
               </Accordion>
             </main>
             <footer className="flex flex-col items-center gap-2 border-t border-border p-6">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col items-center gap-2 xs:flex-row">
                 <span>built with 🧡 by</span>
                 <Link
                   href={myGithubProfileUrl}
@@ -141,13 +141,13 @@ export function SidebarSheet() {
                   lorenzo aceti
                 </Link>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-sm sm:text-base">
                 <span>Check it on</span>
                 <Link
                   href={projectRepositoryUrl}
                   className={cn(
                     buttonVariants({ size: 'none', variant: 'linkSecondary' }),
-                    'flex items-center gap-2 text-base',
+                    'flex items-center gap-2 sm:text-base',
                   )}
                   target="_blank"
                 >

@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export function SetCredentialsKeysWarning() {
   return (
-    <div className="flex w-full items-center justify-center text-red-400">
+    <div className="flex w-full flex-wrap items-center justify-center text-red-400">
       You must set your
       <Link
         href={siteRoutes.settings.credentials}

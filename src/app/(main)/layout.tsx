@@ -7,10 +7,10 @@ export default function MainLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="grid h-screen lg:grid-cols-1">
+    <div className="grid h-screen xl:grid-cols-1">
       <SidebarSheet />
       <Sidebar />
-      <main className="mt-20 flex flex-1 flex-col lg:ml-72 lg:mt-0">
+      <main className="mt-20 flex flex-1 flex-col xl:ml-72 xl:mt-0">
         {children}
       </main>
     </div>

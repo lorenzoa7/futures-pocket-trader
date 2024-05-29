@@ -69,14 +69,25 @@ export function CloseLimitPopover({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild className="hidden lg:block">
         <Button
           type="button"
           variant="link"
           disabled={isPending || isPendingPrice}
-          className="h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
+          className="hidden h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500 lg:inline-flex"
         >
           Limit
+        </Button>
+      </PopoverTrigger>
+      <PopoverTrigger asChild className="lg:hidden">
+        <Button
+          type="button"
+          size="sm"
+          variant="brand"
+          disabled={isPending || isPendingPrice}
+          className="text-xs sm:text-sm lg:hidden"
+        >
+          Close limit
         </Button>
       </PopoverTrigger>
       <PopoverContent>

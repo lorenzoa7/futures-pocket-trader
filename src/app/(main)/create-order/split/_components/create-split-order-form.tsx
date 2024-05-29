@@ -170,7 +170,7 @@ export function CreateSplitOrderForm() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleCreateSplitOrder)}
-              className="flex w-72 flex-col gap-3"
+              className="flex w-full flex-col gap-3 lg:w-1/2 xl:w-72"
             >
               <FormField
                 control={form.control}

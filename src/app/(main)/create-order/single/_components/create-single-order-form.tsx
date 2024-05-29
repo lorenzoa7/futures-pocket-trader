@@ -165,7 +165,7 @@ export function CreateSingleOrderForm() {
       {apiKey.length > 0 && secretKey.length > 0 ? (
         <form
           onSubmit={form.handleSubmit(handleCreateOrder)}
-          className="flex w-full flex-col gap-3 lg:w-72"
+          className="flex w-full flex-col gap-3 lg:w-1/2 xl:w-72"
         >
           <FormField
             control={form.control}

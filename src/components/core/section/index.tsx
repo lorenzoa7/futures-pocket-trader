@@ -8,7 +8,7 @@ type Props = {
 export function Section({ title, children, className, ...props }: Props) {
   return (
     <section className="flex h-full flex-col" {...props}>
-      <header className="hidden items-center border-b border-border p-6 lg:flex">
+      <header className="hidden items-center border-b border-border p-6 xl:flex">
         <div className="flex h-7 items-center">
           <span className="uppercase text-muted-foreground">{title}</span>
         </div>
