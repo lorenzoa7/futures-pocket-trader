@@ -1,4 +1,5 @@
 import { defaultParams } from '@/config/connections'
+import { decryptCredentialsKeys } from '@/functions/decrypt-credentials-keys'
 import { generateQueryString } from '@/functions/generate-query-string'
 import { getApi } from '@/functions/get-api'
 import { BaseApiSchemaWithCredentials } from '@/server/schemas/base-api-schema'
@@ -42,14 +43,19 @@ export async function getOrders({
     timestamp: defaultParams.timestamp,
   }
 
-  const query = generateQueryString({ params, secretKey })
+  const { decryptedApiKey, decryptedSecretKey } = decryptCredentialsKeys({
+    apiKey,
+    secretKey,
+  })
+
+  const query = generateQueryString({ params, secretKey: decryptedSecretKey })
   const api = getApi(isTestnetAccount)
 
   const response = await api.get<GetOrdersResponse>(
     `/fapi/v1/openOrders${query}`,
     {
       headers: {
-        'X-MBX-APIKEY': apiKey ?? '',
+        'X-MBX-APIKEY': decryptedApiKey ?? '',
       },
     },
   )

@@ -1,4 +1,5 @@
 import { defaultParams } from '@/config/connections'
+import { decryptCredentialsKeys } from '@/functions/decrypt-credentials-keys'
 import { generateQueryString } from '@/functions/generate-query-string'
 import { getApi } from '@/functions/get-api'
 import { SetLeverageSchema } from '@/server/schemas/set-leverage-schema'
@@ -22,7 +23,12 @@ export async function setLeverage({
     timestamp: defaultParams.timestamp,
   }
 
-  const query = generateQueryString({ params, secretKey })
+  const { decryptedApiKey, decryptedSecretKey } = decryptCredentialsKeys({
+    apiKey,
+    secretKey,
+  })
+
+  const query = generateQueryString({ params, secretKey: decryptedSecretKey })
   const api = getApi(isTestnetAccount)
 
   const response = await api.post<SetLeverageResponse>(
@@ -30,7 +36,7 @@ export async function setLeverage({
     undefined,
     {
       headers: {
-        'X-MBX-APIKEY': apiKey ?? '',
+        'X-MBX-APIKEY': decryptedApiKey ?? '',
       },
     },
   )

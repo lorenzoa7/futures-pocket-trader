@@ -9,6 +9,7 @@ export const env = createEnv({
     NEXT_PUBLIC_API_URL: z.string(),
     NEXT_PUBLIC_BINANCE_API_URL: z.string(),
     NEXT_PUBLIC_TESTNET_BINANCE_API_URL: z.string(),
+    NEXT_PUBLIC_SECRET_KEY: z.string(),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
@@ -17,5 +18,6 @@ export const env = createEnv({
     NEXT_PUBLIC_BINANCE_API_URL: process.env.NEXT_PUBLIC_BINANCE_API_URL,
     NEXT_PUBLIC_TESTNET_BINANCE_API_URL:
       process.env.NEXT_PUBLIC_TESTNET_BINANCE_API_URL,
+    NEXT_PUBLIC_SECRET_KEY: process.env.NEXT_PUBLIC_SECRET_KEY,
   },
 })

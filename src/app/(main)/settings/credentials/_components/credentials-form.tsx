@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { encryptKey } from '@/functions/encrypt-key'
 import { useAccountStore } from '@/hooks/store/use-account-store'
 import {
   CredentialsSchema,
@@ -34,10 +35,13 @@ export function CredentialsForm() {
   const { reset } = form
 
   async function onSubmit(data: CredentialsSchema) {
+    const encryptedApiKey = encryptKey(data.apiKey)
+    const encryptedSecretKey = encryptKey(data.secretKey)
+
     useAccountStore.setState((state) => ({
       ...state,
-      apiKey: data.apiKey,
-      secretKey: data.secretKey,
+      apiKey: encryptedApiKey,
+      secretKey: encryptedSecretKey,
     }))
 
     reset()
