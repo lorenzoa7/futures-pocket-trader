@@ -1,16 +1,14 @@
 import { QueryProvider } from '@/components/providers/query-provider'
 import ThemeProvider from '@/components/providers/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { siteMetadata, siteViewport } from '@/config/site'
 import { fira } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
-export const metadata: Metadata = {
-  title: 'Futures Pocket Trader',
-  description:
-    'Application with a simplified operations interface for futures market traders.',
-}
+export const metadata: Metadata = siteMetadata
+export const viewport: Viewport = siteViewport
 
 export default function RootLayout({
   children,
