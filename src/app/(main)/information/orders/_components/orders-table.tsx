@@ -67,15 +67,30 @@ export function OrdersTable() {
     <>
       {apiKey.length > 0 && secretKey.length > 0 ? (
         <>
+          {/* Form  */}
           <Form {...form}>
             <form onSubmit={handleSubmit(handleFilter)} ref={formRef}>
-              <Label>Filters</Label>
-              <div className="my-2 flex gap-2.5">
+              <div className="flex w-full items-center justify-between">
+                <Label>Filters</Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full lg:hidden"
+                  onClick={handleRefreshOrders}
+                >
+                  <RefreshCcw
+                    className={cn('size-4', isFetchingOrders && 'animate-spin')}
+                  />
+                </Button>
+              </div>
+
+              <div className="mb-2 mt-0 flex gap-1 lg:my-2 lg:gap-2.5">
                 <FormField
                   control={form.control}
                   name="symbol"
                   render={({ field }) => (
-                    <FormItem className="relative flex flex-col">
+                    <FormItem className="relative flex w-full flex-col lg:w-fit">
                       <Popover
                         open={openSymbolFilter}
                         onOpenChange={setOpenSymbolFilter}
@@ -86,7 +101,7 @@ export function OrdersTable() {
                               variant="outline"
                               role="combobox"
                               className={cn(
-                                'justify-between w-40',
+                                'justify-between lg:w-40 w-full sm:text-sm text-xs',
                                 !field.value && 'text-muted-foreground',
                               )}
                             >
@@ -99,7 +114,7 @@ export function OrdersTable() {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-40 p-0">
+                        <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
                           <Command>
                             {isPendingOrders ? (
                               <div className="mx-auto flex items-center gap-2 py-3">
@@ -110,7 +125,10 @@ export function OrdersTable() {
                               </div>
                             ) : (
                               <>
-                                <CommandInput placeholder="Search symbol..." />
+                                <CommandInput
+                                  placeholder="Search symbol..."
+                                  className="text-xs sm:text-sm"
+                                />
                                 <CommandEmpty>No symbol found.</CommandEmpty>
                                 <CommandGroup>
                                   <CommandList>
@@ -175,7 +193,7 @@ export function OrdersTable() {
                   control={form.control}
                   name="side"
                   render={({ field }) => (
-                    <FormItem className="relative flex flex-col">
+                    <FormItem className="relative flex w-full flex-col lg:w-fit">
                       <Popover
                         open={openSideFilter}
                         onOpenChange={setOpenSideFilter}
@@ -186,7 +204,7 @@ export function OrdersTable() {
                               variant="outline"
                               role="combobox"
                               className={cn(
-                                'justify-between w-40',
+                                'justify-between lg:w-40 w-full sm:text-sm text-xs',
                                 !field.value && 'text-muted-foreground',
                               )}
                             >
@@ -197,7 +215,7 @@ export function OrdersTable() {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-40 p-0">
+                        <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
                           <Command>
                             <CommandGroup>
                               <CommandList>
@@ -254,7 +272,7 @@ export function OrdersTable() {
                   )}
                 />
 
-                <div className="flex flex-1 justify-end pr-3">
+                <div className="hidden flex-1 justify-end pr-3 lg:flex">
                   <Button
                     type="button"
                     variant="ghost"
@@ -273,37 +291,34 @@ export function OrdersTable() {
               </div>
             </form>
           </Form>
-          <ScrollArea className="flex h-96 w-full flex-col gap-3 pr-3">
+
+          {/* Content  */}
+          <ScrollArea className="mt-4 flex w-full flex-col gap-3 lg:mt-0 lg:h-96 lg:pr-3">
             {isPendingOrders ? (
               <div className="flex w-full items-center justify-center">
                 <Spinner className="mt-32 size-10" />
               </div>
             ) : filteredOrders && filteredOrders.length > 0 ? (
-              <Table className="relative rounded-2xl" hasWrapper={false}>
-                <TableHeader className="sticky top-0 z-10 w-full bg-slate-200 dark:bg-slate-800">
-                  <TableRow>
-                    <TableHead className="w-52">Symbol</TableHead>
-                    <TableHead className="w-52">Side</TableHead>
-                    <TableHead className="w-52">Price</TableHead>
-                    <TableHead className="w-52 text-right">Amount</TableHead>
-                    <TableHead className="w-56 text-center">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        className="px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
-                        onClick={handleCancelCancelAllOrders}
-                      >
-                        {isPendingCancelOrder ? (
-                          <Spinner />
-                        ) : (
-                          <span>Cancel all</span>
-                        )}
-                      </Button>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* List (smaller screens) */}
+                <div className="flex flex-col gap-2 lg:hidden">
+                  <Label>Orders</Label>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="brand"
+                      disabled={isPendingCancelOrder}
+                      onClick={handleCancelCancelAllOrders}
+                      className="flex-1"
+                    >
+                      {isPendingCancelOrder ? (
+                        <Spinner />
+                      ) : (
+                        <span>Cancel all orders</span>
+                      )}
+                    </Button>
+                  </div>
                   {filteredOrders
                     .sort(
                       (orderA, orderB) =>
@@ -313,29 +328,38 @@ export function OrdersTable() {
                     .map((order, index) => {
                       const orderSide = getOrderSide(order.side)
                       return (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">
-                            {order.symbol}
-                          </TableCell>
-                          <TableCell
-                            data-long={orderSide === 'LONG'}
-                            data-short={orderSide === 'SHORT'}
-                            className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
-                          >
-                            {orderSide}
-                          </TableCell>
-                          <TableCell>
-                            {Number(order.price).toFixed(2)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {`$ ${convertPriceToUsdt(Number(order.price), Number(order.origQty)).toFixed(2)}`}
-                          </TableCell>
-                          <TableCell className="flex justify-center text-center">
+                        <div
+                          key={index}
+                          className="flex w-full items-center justify-between rounded-lg border-2 border-border p-3 text-sm"
+                        >
+                          <div className="flex flex-col gap-1">
+                            <span>{order.symbol}</span>
+
+                            <span className="text-lg font-bold">
+                              {`$ ${convertPriceToUsdt(Number(order.price), Number(order.origQty)).toFixed(2)}`}
+                            </span>
+
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium">Side: </span>
+                              <span
+                                data-long={orderSide === 'LONG'}
+                                data-short={orderSide === 'SHORT'}
+                                className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
+                              >
+                                {orderSide}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium">Price: </span>
+                              <span>{Number(order.price).toFixed(2)}</span>
+                            </div>
+                          </div>
+                          <div className="flex h-full flex-col gap-2">
                             <Button
                               type="button"
-                              size="icon"
-                              variant="ghost"
-                              className="size-4"
+                              size="sm"
+                              variant="brand"
                               disabled={isPendingCancelOrder}
                               onClick={() => {
                                 cancelOrder({
@@ -349,34 +373,120 @@ export function OrdersTable() {
                                   },
                                 })
                               }}
+                              className="text-xs sm:text-sm"
                             >
-                              {isPendingCancelOrder ? (
-                                <Spinner className="size-4" />
-                              ) : (
-                                <Trash2 className="size-4 text-slate-600 transition-colors hover:text-slate-950 dark:text-slate-400 dark:hover:text-slate-50" />
-                              )}
+                              Cancel order
                             </Button>
-                          </TableCell>
-                        </TableRow>
+                          </div>
+                        </div>
                       )
                     })}
-                </TableBody>
-                <TableFooter className="sticky -bottom-px z-10 bg-slate-200 dark:bg-slate-800">
-                  <TableRow>
-                    <TableCell colSpan={4}>Total (USDT)</TableCell>
-                    <TableCell className="text-right">
-                      <span className="mr-1">$</span>
-                      {filteredOrders
-                        .reduce(
-                          (total, order) =>
-                            total + Number(order.origQty) * Number(order.price),
-                          0,
+                </div>
+
+                {/* Table (bigger screens) */}
+                <Table
+                  className="relative hidden rounded-2xl lg:table"
+                  hasWrapper={false}
+                >
+                  <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-200 dark:bg-slate-800">
+                    <TableRow>
+                      <TableHead className="w-52">Symbol</TableHead>
+                      <TableHead className="w-52">Side</TableHead>
+                      <TableHead className="w-52">Price</TableHead>
+                      <TableHead className="w-52 text-right">Amount</TableHead>
+                      <TableHead className="w-56 text-center">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500"
+                          onClick={handleCancelCancelAllOrders}
+                        >
+                          {isPendingCancelOrder ? (
+                            <Spinner />
+                          ) : (
+                            <span>Cancel all</span>
+                          )}
+                        </Button>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredOrders
+                      .sort(
+                        (orderA, orderB) =>
+                          Number(orderB.price) * Number(orderB.origQty) -
+                          Number(orderA.price) * Number(orderA.origQty),
+                      )
+                      .map((order, index) => {
+                        const orderSide = getOrderSide(order.side)
+                        return (
+                          <TableRow key={index}>
+                            <TableCell className="font-medium">
+                              {order.symbol}
+                            </TableCell>
+                            <TableCell
+                              data-long={orderSide === 'LONG'}
+                              data-short={orderSide === 'SHORT'}
+                              className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
+                            >
+                              {orderSide}
+                            </TableCell>
+                            <TableCell>
+                              {Number(order.price).toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {`$ ${convertPriceToUsdt(Number(order.price), Number(order.origQty)).toFixed(2)}`}
+                            </TableCell>
+                            <TableCell className="flex justify-center text-center">
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="size-4"
+                                disabled={isPendingCancelOrder}
+                                onClick={() => {
+                                  cancelOrder({
+                                    shouldRefetch: true,
+                                    api: {
+                                      apiKey,
+                                      secretKey,
+                                      isTestnetAccount,
+                                      symbol: order.symbol,
+                                      orderId: order.orderId,
+                                    },
+                                  })
+                                }}
+                              >
+                                {isPendingCancelOrder ? (
+                                  <Spinner className="size-4" />
+                                ) : (
+                                  <Trash2 className="size-4 text-slate-600 transition-colors hover:text-slate-950 dark:text-slate-400 dark:hover:text-slate-50" />
+                                )}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
                         )
-                        .toFixed(2)}
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
-              </Table>
+                      })}
+                  </TableBody>
+                  <TableFooter className="sticky -bottom-px z-10 translate-y-px bg-slate-200 dark:bg-slate-800">
+                    <TableRow>
+                      <TableCell colSpan={4}>Total (USDT)</TableCell>
+                      <TableCell className="text-right">
+                        <span className="mr-1">$</span>
+                        {filteredOrders
+                          .reduce(
+                            (total, order) =>
+                              total +
+                              Number(order.origQty) * Number(order.price),
+                            0,
+                          )
+                          .toFixed(2)}
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </>
             ) : (
               <div className="text-center">
                 <Label>

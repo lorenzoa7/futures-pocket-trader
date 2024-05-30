@@ -316,6 +316,7 @@ export function PositionsTable() {
               </div>
             ) : filteredPositions && filteredPositions.length > 0 ? (
               <>
+                {/* List (smaller screens) */}
                 <div className="flex flex-col gap-2 lg:hidden">
                   <Label>Positions</Label>
                   <div className="flex items-center gap-2">
@@ -456,6 +457,8 @@ export function PositionsTable() {
                       )
                     })}
                 </div>
+
+                {/* Table (bigger screens) */}
                 <Table
                   className="relative hidden rounded-2xl lg:table"
                   hasWrapper={false}
