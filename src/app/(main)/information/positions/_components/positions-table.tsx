@@ -395,7 +395,7 @@ export function PositionsTable() {
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
                               <span>{position.symbol}</span>
-                              <span className="rounded bg-slate-200 px-1 text-yellow-600 dark:bg-slate-800 dark:text-yellow-400">{`${position.leverage}x`}</span>
+                              <span className="rounded bg-slate-200 px-1 text-yellow-700 dark:bg-slate-800 dark:text-yellow-400">{`${position.leverage}x`}</span>
                             </div>
 
                             <span className="text-lg font-bold">
@@ -410,7 +410,7 @@ export function PositionsTable() {
                               <span
                                 data-long={positionSide === 'LONG'}
                                 data-short={positionSide === 'SHORT'}
-                                className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
+                                className="data-[long=true]:text-green-700 data-[short=true]:text-red-700 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
                               >
                                 {positionSide}
                               </span>

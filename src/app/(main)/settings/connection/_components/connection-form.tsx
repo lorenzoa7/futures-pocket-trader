@@ -50,7 +50,7 @@ export function ConnectionForm() {
           control={form.control}
           name="isTestnetAccount"
           render={({ field }) => (
-            <FormItem className="flex w-2/3 flex-row items-center justify-between rounded-lg border p-4">
+            <FormItem className="flex flex-col justify-between rounded-lg border p-4 sm:flex-row sm:items-center lg:w-2/3">
               <div className="space-y-0.5">
                 <FormLabel htmlFor="testnet" className="text-base">
                   Testnest credentials

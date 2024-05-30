@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 import { useAccountStore } from '@/hooks/store/use-account-store'
 import {
   CredentialsSchema,
@@ -47,12 +48,18 @@ export function CredentialsForm() {
   return (
     <>
       {apiKey.length > 0 && secretKey.length > 0 && (
-        <div className="space-y-4">
+        <div className="mb-4 space-y-4">
           <div className="flex items-center gap-2 rounded-lg border border-border p-3 text-sm">
             <KeyIcon className="size-5" />
             <p>You already have credentials keys saved in the application.</p>
           </div>
-          <div className="relative">
+          <Separator className="sm:hidden" />
+          <div className="relative flex justify-center text-xs uppercase sm:hidden">
+            <span className="bg-background text-center text-muted-foreground">
+              But you can override them and save new ones
+            </span>
+          </div>
+          <div className="relative hidden sm:block">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
@@ -74,7 +81,11 @@ export function CredentialsForm() {
               <FormItem>
                 <FormLabel>Your API key</FormLabel>
                 <FormControl>
-                  <Input type="password" className="w-96" {...field} />
+                  <Input
+                    type="password"
+                    className="w-full lg:w-96"
+                    {...field}
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -89,7 +100,11 @@ export function CredentialsForm() {
               <FormItem>
                 <FormLabel>Your secret key</FormLabel>
                 <FormControl>
-                  <Input type="password" className="w-96" {...field} />
+                  <Input
+                    type="password"
+                    className="w-full lg:w-96"
+                    {...field}
+                  />
                 </FormControl>
 
                 <FormMessage />

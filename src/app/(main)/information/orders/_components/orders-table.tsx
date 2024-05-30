@@ -344,7 +344,7 @@ export function OrdersTable() {
                               <span
                                 data-long={orderSide === 'LONG'}
                                 data-short={orderSide === 'SHORT'}
-                                className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
+                                className="data-[long=true]:text-green-700 data-[short=true]:text-red-700 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
                               >
                                 {orderSide}
                               </span>
