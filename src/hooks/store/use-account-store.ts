@@ -6,6 +6,7 @@ type Props = {
   apiKey: string
   secretKey: string
   isTestnetAccount: boolean
+  displayPwaButton: boolean
 }
 
 export const useAccountStore = create<Props>()(
@@ -15,6 +16,7 @@ export const useAccountStore = create<Props>()(
       apiKey: '',
       secretKey: '',
       isTestnetAccount: false,
+      displayPwaButton: true,
     }),
     {
       name: `${appStorageKey}:${storageKeys.account}`,
