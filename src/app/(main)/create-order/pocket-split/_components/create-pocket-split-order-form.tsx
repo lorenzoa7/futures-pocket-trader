@@ -100,63 +100,8 @@ export function CreatePocketSplitOrderForm() {
   const [data, setData] = useState<PocketSplitOrderSchema>()
   const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false)
 
-  // async function handleCreateSplitOrder(data: PocketSplitOrderSchema) {
-  //   const selectedSymbolData = symbols?.find(
-  //     (symbol) => symbol.symbol === data.symbol,
-  //   )
-
-  //   const precision = selectedSymbolData && {
-  //     quantity: selectedSymbolData.quantityPrecision,
-  //     price: selectedSymbolData.pricePrecision,
-  //     baseAsset: selectedSymbolData.baseAssetPrecision,
-  //     quote: selectedSymbolData.quotePrecision,
-  //   }
-
-  //   if (!precision) {
-  //     toast.error('Something went wrong. Check the parameters and try again!')
-  //     return
-  //   }
-
-  //   data.price = roundToDecimals(data.price, precision.price || 0)
-
-  //   data.prices = Array.from({ length: data.ordersQuantity }).map(
-  //     (_, index) => {
-  //       const price =
-  //         (1 -
-  //           (data.dropPercentage / data.ordersQuantity / 100) * (index + 1)) *
-  //         data.price
-
-  //       const correctedPrice =
-  //         price - (price % Number(selectedSymbolData.filters[0].tickSize))
-  //       return roundToDecimals(correctedPrice, precision.price)
-  //     },
-  //   )
-
-  //   data.sizes = data.prices.map((price) =>
-  //     data.isUsdtQuantity
-  //       ? roundToDecimals(
-  //           convertUsdtToPrice(data.size, price),
-  //           precision.quantity || 0,
-  //         )
-  //       : roundToDecimals(data.size, precision.quantity || 0),
-  //   )
-
-  //   if (data.prices.some((price) => price <= 0)) {
-  //     toast.error('Price is too low. Set a new price and try again.')
-  //     return
-  //   }
-
-  //   if (data.sizes.some((size) => size <= 0)) {
-  //     toast.error('Size is too low. Set a new size and try again.')
-  //     return
-  //   }
-
-  //   setData(data)
-  //   setOpenConfirmationDialog(true)
-  // }
-
   async function handleCreateSplitOrder(data: PocketSplitOrderSchema) {
-    const { pocket, dropPercentage, orders, ordersQuantity, side, size } = data
+    const { pocket, dropPercentage, ordersQuantity, size } = data
     if (pocket.symbols.length < 0) {
       toast.error(
         'There is no symbols (or currencies) in this pocket. Try again!',
@@ -195,12 +140,10 @@ export function CreatePocketSplitOrderForm() {
 
         const basePrice = roundToDecimals(lastPrice, precision.price || 0)
 
-        const prices = Array.from({ length: data.ordersQuantity }).map(
+        const prices = Array.from({ length: ordersQuantity }).map(
           (_, index) => {
             const price =
-              (1 -
-                (data.dropPercentage / data.ordersQuantity / 100) *
-                  (index + 1)) *
+              (1 - (dropPercentage / ordersQuantity / 100) * (index + 1)) *
               basePrice
 
             const correctedPrice =
@@ -211,7 +154,7 @@ export function CreatePocketSplitOrderForm() {
 
         const sizes = prices.map((price) =>
           roundToDecimals(
-            convertUsdtToPrice(data.size, price),
+            convertUsdtToPrice(size, price),
             precision.quantity || 0,
           ),
         )
@@ -394,7 +337,11 @@ export function CreatePocketSplitOrderForm() {
                   type="submit"
                   className="flex w-full items-center gap-2 bg-green-300 hover:bg-green-300/80 dark:bg-green-800 dark:hover:bg-green-800/80"
                   onClick={() => setValue('side', 'BUY')}
-                  disabled={isSubmitting || isPendingSymbols}
+                  disabled={
+                    isSubmitting ||
+                    isPendingSymbols ||
+                    isPendingLastPocketPrices
+                  }
                 >
                   {isSubmitting && side === 'BUY' && <Spinner />}
                   Buy/Long
@@ -404,7 +351,11 @@ export function CreatePocketSplitOrderForm() {
                   type="submit"
                   className="flex w-full items-center gap-2 bg-red-300 hover:bg-red-300/80 dark:bg-red-800 dark:hover:bg-red-800/80"
                   onClick={() => setValue('side', 'SELL')}
-                  disabled={isSubmitting || isPendingSymbols}
+                  disabled={
+                    isSubmitting ||
+                    isPendingSymbols ||
+                    isPendingLastPocketPrices
+                  }
                 >
                   {isSubmitting && side === 'SELL' && <Spinner />}
                   Sell/Short

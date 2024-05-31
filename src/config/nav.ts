@@ -41,6 +41,10 @@ export const navConfig: NavItem[] = [
         title: 'Orders',
         href: siteRoutes.information.orders,
       },
+      {
+        title: 'Pockets',
+        href: siteRoutes.information.pockets,
+      },
     ],
   },
   {

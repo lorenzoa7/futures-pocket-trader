@@ -14,6 +14,7 @@ export const siteRoutes = {
   information: {
     orders: '/information/orders',
     positions: '/information/positions',
+    pockets: '/information/pockets',
   },
 }
 
