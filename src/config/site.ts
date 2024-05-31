@@ -9,6 +9,7 @@ export const siteRoutes = {
   createOrder: {
     single: '/create-order/single',
     split: '/create-order/split',
+    pocketSplit: '/create-order/pocket-split',
   },
   information: {
     orders: '/information/orders',

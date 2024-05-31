@@ -1,6 +1,5 @@
 'use client'
 
-import { ConfirmSplitOrderDialog } from '@/app/(main)/create-order/_components/confirm-split-order-dialog'
 import { LeveragePopover } from '@/app/(main)/create-order/_components/leverage-popover'
 import { MarginTypePopover } from '@/app/(main)/create-order/_components/margin-type-popover'
 import { SetCredentialsKeysWarning } from '@/components/core/set-credentials-keys-warning'
@@ -51,6 +50,7 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { ConfirmSplitOrderDialog } from './confirm-split-order-dialog'
 
 export function CreateSplitOrderForm() {
   const { apiKey, secretKey, isTestnetAccount } = useAccountStore()

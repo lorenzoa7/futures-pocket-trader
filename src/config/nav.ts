@@ -22,6 +22,10 @@ export const navConfig: NavItem[] = [
         title: 'Split',
         href: siteRoutes.createOrder.split,
       },
+      {
+        title: 'Pocket split',
+        href: siteRoutes.createOrder.pocketSplit,
+      },
     ],
   },
   {
