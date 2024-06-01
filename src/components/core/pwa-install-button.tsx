@@ -43,7 +43,7 @@ export function PwaInstallButton() {
   }
 
   return (
-    <div className="fixed left-1/2 top-5 z-50 flex -translate-x-1/2 flex-col items-center gap-4 rounded-lg bg-secondary shadow-2xl sm:p-4 ">
+    <div className="fixed left-1/2 top-5 z-50 flex w-[75vw] -translate-x-1/2 flex-col items-center gap-4 rounded-lg bg-secondary p-2 shadow-2xl sm:w-fit sm:p-4">
       <h1 className="text-center text-xs font-medium sm:text-sm">
         Do you want to install this application?
       </h1>
