@@ -9,7 +9,13 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="relative flex flex-col items-center justify-around rounded border border-border bg-background p-4 text-center shadow-lg sm:p-8">
-        <Image src={Logo} alt="Pocket Trader's logo." width={48} height={48} />
+        <Image
+          src={Logo}
+          alt="Pocket Trader's logo."
+          width={48}
+          height={48}
+          className="mb-5"
+        />
         <h1 className="text-6xl font-extrabold sm:text-9xl ">404</h1>
         <span className="text-2xl font-semibold uppercase sm:text-4xl">
           Page not found.
