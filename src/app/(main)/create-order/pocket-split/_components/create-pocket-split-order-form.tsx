@@ -102,10 +102,8 @@ export function CreatePocketSplitOrderForm() {
 
   async function handleCreateSplitOrder(data: PocketSplitOrderSchema) {
     const { pocket, dropPercentage, ordersQuantity, size } = data
-    if (pocket.symbols.length < 0) {
-      toast.error(
-        'There is no symbols (or currencies) in this pocket. Try again!',
-      )
+    if (pocket.symbols.length === 0) {
+      toast.error('There are no symbols (or currencies) in this pocket!')
       return
     }
 
