@@ -39,7 +39,7 @@ export const siteMetadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://futures-pocket-trader.com',
+    url: 'https://futurespockettrader.com',
     title: siteConfig.title,
     description: siteConfig.description,
     siteName: siteConfig.title,
@@ -56,7 +56,6 @@ export const siteMetadata: Metadata = {
     description: siteConfig.description,
   },
   applicationName: siteConfig.title,
-  // metadataBase: new URL(env.NEXT_PUBLIC_NEXT_API_URL),
   formatDetection: {
     telephone: false,
   },
