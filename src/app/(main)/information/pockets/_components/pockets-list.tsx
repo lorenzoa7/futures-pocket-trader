@@ -18,7 +18,8 @@ import {
   pocketInformationSchema,
 } from '@/schemas/pocket-information-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronRightIcon, PlusIcon } from 'lucide-react'
+import { ChevronDownIcon, ChevronRightIcon, PlusIcon } from 'lucide-react'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { v4 as uuid } from 'uuid'
@@ -87,27 +88,58 @@ export function PocketsList() {
           </form>
         </Form>
 
-        <ScrollArea className="mt-2 h-96">
+        <ScrollArea className="mt-2 h-80 2xl:h-96">
           <div className="flex flex-col gap-2">
             {pockets.map((pocket) => (
-              <div
-                key={pocket.id}
-                data-selected={selectedPocket?.id === pocket.id}
-                onClick={() =>
-                  useAccountStore.setState((state) => ({
-                    ...state,
-                    selectedPocketId: pocket.id,
-                  }))
-                }
-                className="group flex w-full cursor-pointer items-center justify-between rounded-md border border-border p-3 text-sm duration-200 hover:bg-muted/25 data-[selected=true]:bg-muted/50"
-              >
-                {pocket.name}
+              <>
+                <div
+                  key={pocket.id}
+                  data-selected={selectedPocket?.id === pocket.id}
+                  onClick={() =>
+                    useAccountStore.setState((state) => ({
+                      ...state,
+                      selectedPocketId: pocket.id,
+                    }))
+                  }
+                  className="group hidden w-full cursor-pointer items-center justify-between rounded-md border border-border p-3 text-sm duration-200 hover:bg-muted/25 data-[selected=true]:bg-muted/50 lg:flex"
+                >
+                  {pocket.name}
 
-                <ChevronRightIcon
-                  data-selected={selectedPocketId === pocket.id}
-                  className="size-5 duration-200 group-hover:translate-x-1 data-[selected=true]:translate-x-1"
-                />
-              </div>
+                  <ChevronRightIcon
+                    data-selected={selectedPocketId === pocket.id}
+                    className="size-5 duration-200 group-hover:translate-x-1 data-[selected=true]:translate-x-1"
+                  />
+                </div>
+
+                <Link
+                  href={'#pocket-information'}
+                  onClick={(e) => {
+                    e.preventDefault()
+
+                    useAccountStore.setState((state) => ({
+                      ...state,
+                      selectedPocketId: pocket.id,
+                    }))
+
+                    const href = e.currentTarget.href
+                    const sectionId = href.replace(/.*#/, '')
+                    const sectionElement = document.getElementById(sectionId)
+
+                    sectionElement?.scrollIntoView({
+                      behavior: 'smooth',
+                    })
+                  }}
+                  data-selected={selectedPocket?.id === pocket.id}
+                  className="group flex w-full cursor-pointer items-center justify-between rounded-md border border-border p-3 text-sm duration-200 hover:bg-muted/25 data-[selected=true]:bg-muted/50 lg:hidden"
+                >
+                  {pocket.name}
+
+                  <ChevronDownIcon
+                    data-selected={selectedPocketId === pocket.id}
+                    className="size-5 duration-200 group-hover:translate-y-1 data-[selected=true]:translate-y-1"
+                  />
+                </Link>
+              </>
             ))}
           </div>
         </ScrollArea>

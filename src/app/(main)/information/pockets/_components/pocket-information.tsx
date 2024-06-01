@@ -195,7 +195,7 @@ export function PocketInformation() {
   }, [selectedPocket, setValue])
 
   return (
-    <Card className="flex-1">
+    <Card id="pocket-information" className="flex-1">
       {selectedPocket && (
         <>
           <CardHeader>
@@ -218,7 +218,7 @@ export function PocketInformation() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-2"
                 >
-                  <ScrollArea className="mt-2 h-80 pr-3">
+                  <ScrollArea className="mt-2 h-72 pr-3 2xl:h-80">
                     <div className="flex flex-col gap-2">
                       {activeSearch.length > 0 &&
                         activeSearch.map((symbol) => {

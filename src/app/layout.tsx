@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={cn('font-fira antialiased', fira.variable)}
+        className={cn('font-fira antialiased !scroll-smooth', fira.variable)}
         suppressHydrationWarning
       >
         <ThemeProvider

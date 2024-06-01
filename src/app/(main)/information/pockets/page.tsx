@@ -18,7 +18,7 @@ export default function Pockets() {
           used in some parts of the application as a pre-defined set.
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex gap-2">
+      <CardContent className="flex flex-col gap-2 lg:flex-row">
         <PocketsList />
         <PocketInformation />
       </CardContent>
