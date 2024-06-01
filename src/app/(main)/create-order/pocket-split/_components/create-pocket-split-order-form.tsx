@@ -54,10 +54,10 @@ export function CreatePocketSplitOrderForm() {
         name: '',
         symbols: [],
       },
-      size: 500,
+      size: 0,
       side: 'BUY',
-      ordersQuantity: 5,
-      dropPercentage: 30,
+      ordersQuantity: 2,
+      dropPercentage: 10,
       orders: [],
     },
   })
@@ -93,8 +93,8 @@ export function CreatePocketSplitOrderForm() {
     ...symbolsPricesQueries.map((result) => result.data ?? {}),
   )
 
-  const isPendingLastPocketPrices = symbolsPricesQueries.some(
-    (result) => result.isPending,
+  const isFetchingPocketLastPrices = symbolsPricesQueries.some(
+    (result) => result.isFetching,
   )
 
   const [data, setData] = useState<PocketSplitOrderSchema>()
@@ -188,179 +188,191 @@ export function CreatePocketSplitOrderForm() {
     <>
       {apiKey.length > 0 && secretKey.length > 0 ? (
         <>
-          <ConfirmPocketSplitOrderDialog
-            open={openConfirmationDialog}
-            setOpen={setOpenConfirmationDialog}
-            setData={setData}
-            data={data}
-          />
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleCreateSplitOrder)}
-              className="flex w-full flex-col gap-3 lg:w-1/2 xl:w-72"
-            >
-              <FormField
-                control={form.control}
-                name="pocket"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Pocket</FormLabel>
+          {isPendingSymbols ? (
+            <Spinner className="size-8" />
+          ) : (
+            <>
+              <ConfirmPocketSplitOrderDialog
+                open={openConfirmationDialog}
+                setOpen={setOpenConfirmationDialog}
+                setData={setData}
+                data={data}
+              />
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(handleCreateSplitOrder)}
+                  className="flex w-full flex-col gap-3 lg:w-1/2 xl:w-72"
+                >
+                  <FormField
+                    control={form.control}
+                    name="pocket"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Pocket</FormLabel>
 
-                    <Popover open={open} onOpenChange={setOpen}>
-                      <div className="flex gap-2">
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                'justify-between w-full truncate',
-                                !field.value.id && 'text-muted-foreground',
-                              )}
-                            >
-                              {field.value.id
-                                ? pockets?.find(
-                                    (pocket) => pocket.id === field.value.id,
-                                  )?.name
-                                : 'Select pocket'}
-                              <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                      </div>
-                      <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
-                        <Command>
-                          <CommandInput placeholder="Search symbol..." />
-                          <CommandEmpty>No pocket found.</CommandEmpty>
-                          <CommandGroup>
-                            <CommandList className="max-h-32">
-                              {pockets?.map((pocket) => (
-                                <CommandItem
-                                  value={pocket.name}
-                                  key={pocket.id}
-                                  onSelect={() => {
-                                    form.setValue('pocket', pocket)
-                                    setOpen(false)
-                                  }}
+                        <Popover open={open} onOpenChange={setOpen}>
+                          <div className="flex gap-2">
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  className={cn(
+                                    'justify-between w-full truncate',
+                                    !field.value.id && 'text-muted-foreground',
+                                  )}
                                 >
-                                  <Check
-                                    className={cn(
-                                      'mr-2 h-4 w-4',
-                                      pocket.id === field.value.id
-                                        ? 'opacity-100'
-                                        : 'opacity-0',
+                                  <div className="flex items-center gap-2">
+                                    {isFetchingPocketLastPrices && (
+                                      <Spinner className="size-4" />
                                     )}
-                                  />
-                                  {pocket.name}
-                                </CommandItem>
-                              ))}
-                            </CommandList>
-                          </CommandGroup>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
+                                    {field.value.id
+                                      ? pockets?.find(
+                                          (pocket) =>
+                                            pocket.id === field.value.id,
+                                        )?.name
+                                      : 'Select pocket'}
+                                  </div>
+                                  <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                          </div>
+                          <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                              <CommandInput placeholder="Search symbol..." />
+                              <CommandEmpty>No pocket found.</CommandEmpty>
+                              <CommandGroup>
+                                <CommandList className="max-h-32">
+                                  {pockets?.map((pocket) => (
+                                    <CommandItem
+                                      value={pocket.name}
+                                      key={pocket.id}
+                                      onSelect={() => {
+                                        form.setValue('pocket', pocket)
+                                        setOpen(false)
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          pocket.id === field.value.id
+                                            ? 'opacity-100'
+                                            : 'opacity-0',
+                                        )}
+                                      />
+                                      {pocket.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandList>
+                              </CommandGroup>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="size"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Size (for each symbol)</FormLabel>
-                    <div className="flex gap-2">
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          className="[&::-webkit-inner-spin-button]:appearance-none"
-                        />
-                      </FormControl>
-                      <div className="h-10 rounded-md border border-input px-3 py-2 text-sm font-medium uppercase">
-                        USDT
-                      </div>
-                    </div>
+                  <FormField
+                    control={form.control}
+                    name="size"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Size (for each symbol)</FormLabel>
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input
+                              type="number"
+                              {...field}
+                              className="[&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                          </FormControl>
+                          <div className="h-10 rounded-md border border-input px-3 py-2 text-sm font-medium uppercase">
+                            USDT
+                          </div>
+                        </div>
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="ordersQuantity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Orders quantity (for each symbol)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        {...field}
-                        className="[&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="ordersQuantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Orders quantity (for each symbol)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            className="[&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="dropPercentage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Drop percentage - {field.value}%</FormLabel>
-                    <FormControl>
-                      <Slider
-                        min={0}
-                        max={99}
-                        step={1}
-                        defaultValue={[field.value]}
-                        onValueChange={(vals) => {
-                          field.onChange(vals[0])
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="dropPercentage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Drop percentage - {field.value}%</FormLabel>
+                        <FormControl>
+                          <Slider
+                            min={0}
+                            max={99}
+                            step={1}
+                            defaultValue={[field.value]}
+                            onValueChange={(vals) => {
+                              field.onChange(vals[0])
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="mt-2 flex gap-2">
-                <Button
-                  variant="secondary"
-                  type="submit"
-                  className="flex w-full items-center gap-2 bg-green-300 hover:bg-green-300/80 dark:bg-green-800 dark:hover:bg-green-800/80"
-                  onClick={() => setValue('side', 'BUY')}
-                  disabled={
-                    isSubmitting ||
-                    isPendingSymbols ||
-                    isPendingLastPocketPrices
-                  }
-                >
-                  {isSubmitting && side === 'BUY' && <Spinner />}
-                  Buy/Long
-                </Button>
-                <Button
-                  variant="secondary"
-                  type="submit"
-                  className="flex w-full items-center gap-2 bg-red-300 hover:bg-red-300/80 dark:bg-red-800 dark:hover:bg-red-800/80"
-                  onClick={() => setValue('side', 'SELL')}
-                  disabled={
-                    isSubmitting ||
-                    isPendingSymbols ||
-                    isPendingLastPocketPrices
-                  }
-                >
-                  {isSubmitting && side === 'SELL' && <Spinner />}
-                  Sell/Short
-                </Button>
-              </div>
-            </form>
-          </Form>
+                  <div className="mt-2 flex gap-2">
+                    <Button
+                      variant="secondary"
+                      type="submit"
+                      className="flex w-full items-center gap-2 bg-green-300 hover:bg-green-300/80 dark:bg-green-800 dark:hover:bg-green-800/80"
+                      onClick={() => setValue('side', 'BUY')}
+                      disabled={
+                        isSubmitting ||
+                        isPendingSymbols ||
+                        isFetchingPocketLastPrices
+                      }
+                    >
+                      {isSubmitting && side === 'BUY' && <Spinner />}
+                      Buy/Long
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      type="submit"
+                      className="flex w-full items-center gap-2 bg-red-300 hover:bg-red-300/80 dark:bg-red-800 dark:hover:bg-red-800/80"
+                      onClick={() => setValue('side', 'SELL')}
+                      disabled={
+                        isSubmitting ||
+                        isPendingSymbols ||
+                        isFetchingPocketLastPrices
+                      }
+                    >
+                      {isSubmitting && side === 'SELL' && <Spinner />}
+                      Sell/Short
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </>
+          )}
         </>
       ) : (
         <SetCredentialsKeysWarning />

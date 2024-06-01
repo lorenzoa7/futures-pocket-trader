@@ -106,7 +106,7 @@ export function ConfirmPocketSplitOrderDialog({
                 return order.prices.flatMap((price, index) => {
                   return (
                     <div
-                      key={index}
+                      key={`${order.symbol}.${index}`}
                       className="flex w-full items-center justify-between rounded-lg border-2 border-border p-3 text-sm"
                     >
                       <div className="flex flex-col gap-1">
