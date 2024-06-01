@@ -94,7 +94,45 @@ export function ConfirmSplitOrderDialog({
             </DialogDescription>
           </DialogHeader>
           <ScrollArea className="flex h-96 w-full flex-col gap-3 pr-3">
-            <Table className="relative rounded-2xl" hasWrapper={false}>
+            {/* List (smaller screens) */}
+            <div className="flex flex-col gap-2 sm:hidden">
+              {data.prices.map((price, index) => (
+                <div
+                  key={index}
+                  className="flex w-full items-center justify-between rounded-lg border-2 border-border p-3 text-sm"
+                >
+                  <div className="flex flex-col gap-1">
+                    <span>{data.symbol}</span>
+
+                    <span className="text-lg font-bold">
+                      {`$ ${convertPriceToUsdt(data.sizes[index], price).toFixed(2)}`}
+                    </span>
+
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium">Side: </span>
+                      <span
+                        data-long={orderSide === 'LONG'}
+                        data-short={orderSide === 'SHORT'}
+                        className="data-[long=true]:text-green-700 data-[short=true]:text-red-700 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
+                      >
+                        {orderSide}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium">Entry Price: </span>
+                      <span>{price.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Table (bigger screens) */}
+            <Table
+              className="relative hidden rounded-2xl sm:table"
+              hasWrapper={false}
+            >
               <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-800 ">
                 <TableRow className="hover:bg-slate-800/50 data-[state=selected]:bg-slate-800">
                   <TableHead className="w-52 text-slate-300">Symbol</TableHead>
@@ -148,7 +186,21 @@ export function ConfirmSplitOrderDialog({
             </Table>
           </ScrollArea>
 
-          <DialogFooter className="pr-3">
+          <div className="sm:hidden">
+            <span className="font-medium">Total (USDT): </span>
+            <span className="mr-1">$</span>
+            <span>
+              {data.prices
+                .reduce(
+                  (total, price, index) =>
+                    total + convertPriceToUsdt(data.sizes[index], price),
+                  0,
+                )
+                .toFixed(2)}
+            </span>
+          </div>
+
+          <DialogFooter className="gap-2 pr-3 sm:gap-0">
             <DialogClose asChild>
               <Button
                 type="button"

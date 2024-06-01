@@ -128,7 +128,7 @@ export function ConfirmPocketSplitOrderDialog({
                         </div>
 
                         <div className="flex items-center gap-1">
-                          <span className="font-medium">Price: </span>
+                          <span className="font-medium">Entry Price: </span>
                           <span>{price.toFixed(2)}</span>
                         </div>
                       </div>
