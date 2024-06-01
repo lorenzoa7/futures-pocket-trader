@@ -116,7 +116,6 @@ export function LeveragePopover({ symbol }: Props) {
                       onValueChange={(vals) => {
                         field.onChange(vals[0])
                       }}
-                      className="dark"
                     />
                   </FormControl>
                   <FormMessage />

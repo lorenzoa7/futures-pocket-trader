@@ -92,10 +92,8 @@ export function ConfirmPocketSplitOrderDialog({
       {!!data && (
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-slate-50">
-              Confirm pocket split order
-            </DialogTitle>
-            <DialogDescription className="text-slate-300">
+            <DialogTitle>Confirm pocket split order</DialogTitle>
+            <DialogDescription>
               {`You will create ${data.ordersQuantity * data.pocket.symbols.length} orders, ${data.ordersQuantity} for each symbol in the ${data.pocket.name} pocket.`}
             </DialogDescription>
           </DialogHeader>
@@ -143,33 +141,26 @@ export function ConfirmPocketSplitOrderDialog({
               className="relative hidden rounded-2xl sm:table"
               hasWrapper={false}
             >
-              <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-800 ">
-                <TableRow className="hover:bg-slate-800/50 data-[state=selected]:bg-slate-800">
-                  <TableHead className="w-52 text-slate-300">Symbol</TableHead>
-                  <TableHead className="w-52 text-slate-300">Side</TableHead>
-                  <TableHead className="w-52 text-slate-300">
-                    Entry Price
-                  </TableHead>
-                  <TableHead className="w-52 text-right text-slate-300">
-                    Size
-                  </TableHead>
+              <TableHeader className="sticky top-0 z-10 w-full -translate-y-px bg-slate-200 dark:bg-slate-800 ">
+                <TableRow>
+                  <TableHead className="w-52">Symbol</TableHead>
+                  <TableHead className="w-52">Side</TableHead>
+                  <TableHead className="w-52">Entry Price</TableHead>
+                  <TableHead className="w-52 text-right">Size</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.orders.flatMap((order) => {
                   return order.prices.flatMap((price, index) => {
                     return (
-                      <TableRow
-                        key={`${order.symbol}.${index}`}
-                        className="text-slate-50 hover:bg-slate-800/50 data-[state=selected]:bg-slate-800"
-                      >
+                      <TableRow key={`${order.symbol}.${index}`}>
                         <TableCell className="font-medium">
                           {order.symbol}
                         </TableCell>
                         <TableCell
                           data-long={orderSide === 'LONG'}
                           data-short={orderSide === 'SHORT'}
-                          className="data-[long=true]:text-green-400 data-[short=true]:text-red-400"
+                          className="data-[long=true]:text-green-600 data-[short=true]:text-red-600 dark:data-[long=true]:text-green-400 dark:data-[short=true]:text-red-400"
                         >
                           {orderSide}
                         </TableCell>
@@ -182,12 +173,10 @@ export function ConfirmPocketSplitOrderDialog({
                   })
                 })}
               </TableBody>
-              <TableFooter className="sticky -bottom-px z-10 bg-slate-800">
-                <TableRow className="hover:bg-slate-800/50 data-[state=selected]:bg-slate-800">
-                  <TableCell colSpan={3} className="text-slate-300">
-                    Total (USDT)
-                  </TableCell>
-                  <TableCell className="text-right text-slate-300">
+              <TableFooter className="sticky -bottom-px z-10 bg-slate-200 dark:bg-slate-800">
+                <TableRow>
+                  <TableCell colSpan={3}>Total (USDT)</TableCell>
+                  <TableCell className="text-right">
                     <span className="mr-1">$</span>
                     {data.orders
                       .reduce((total, order) => {
@@ -225,25 +214,19 @@ export function ConfirmPocketSplitOrderDialog({
 
           <DialogFooter className="gap-2 pr-3 sm:gap-0">
             <DialogClose asChild>
-              <Button
-                type="button"
-                variant="outline"
-                className="border-slate-800 bg-slate-950 text-slate-50 hover:bg-slate-800 hover:text-slate-50"
-              >
+              <Button type="button" variant="secondary">
                 Close
               </Button>
             </DialogClose>
 
             <Button
               type="button"
-              variant="secondary"
-              className="flex gap-2 bg-slate-800 text-slate-50 hover:bg-slate-800/80"
+              variant="default"
+              className="flex gap-2"
               disabled={isPending}
               onClick={handleConfirmSplitOrder}
             >
-              {isPending && (
-                <Spinner className="size-4 fill-white text-slate-800" />
-              )}
+              {isPending && <Spinner className="size-4" />}
               Confirm
             </Button>
           </DialogFooter>
