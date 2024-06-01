@@ -150,7 +150,6 @@ export function CreateSingleOrderForm() {
   }
 
   useEffect(() => {
-    console.log('sdgsdgsdgsdgsgd')
     if (lastPrice) {
       setValue('price', lastPrice)
     }

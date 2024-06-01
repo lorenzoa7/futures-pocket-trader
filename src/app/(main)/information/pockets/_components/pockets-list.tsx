@@ -18,13 +18,16 @@ import {
   pocketInformationSchema,
 } from '@/schemas/pocket-information-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronRightIcon, PlusIcon, XIcon } from 'lucide-react'
+import { ChevronRightIcon, PlusIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { v4 as uuid } from 'uuid'
 
 export function PocketsList() {
-  const { pockets, selectedPocket } = useAccountStore()
+  const { pockets, selectedPocketId } = useAccountStore()
+  const selectedPocket = pockets.find(
+    (pocket) => pocket.id === selectedPocketId,
+  )
 
   const form = useForm<PocketInformationSchema>({
     resolver: zodResolver(pocketInformationSchema),
@@ -32,6 +35,8 @@ export function PocketsList() {
       name: '',
     },
   })
+
+  const { reset } = form
 
   function onSubmit(data: PocketInformationSchema) {
     const { name } = data
@@ -41,10 +46,15 @@ export function PocketsList() {
       return
     }
 
+    const newPocket = { id: uuid(), name, symbols: [] }
+
     useAccountStore.setState((state) => ({
       ...state,
-      pockets: [...state.pockets, { id: uuid(), name, symbols: [] }],
+      pockets: [...state.pockets, newPocket],
+      selectedPocketId: newPocket.id,
     }))
+
+    reset()
   }
 
   return (
@@ -86,32 +96,15 @@ export function PocketsList() {
                 onClick={() =>
                   useAccountStore.setState((state) => ({
                     ...state,
-                    selectedPocket: pocket,
+                    selectedPocketId: pocket.id,
                   }))
                 }
                 className="group flex w-full cursor-pointer items-center justify-between rounded-md border border-border p-3 text-sm duration-200 hover:bg-muted/25 data-[selected=true]:bg-muted/50"
               >
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    size="none"
-                    variant="ghost"
-                    className="duration-200 hover:scale-110"
-                    onClick={() =>
-                      useAccountStore.setState((state) => ({
-                        ...state,
-                        pockets: state.pockets.filter(
-                          (savedPocket) => pocket.id !== savedPocket.id,
-                        ),
-                      }))
-                    }
-                  >
-                    <XIcon className="size-4 " />
-                  </Button>
-                  {pocket.name}
-                </div>
+                {pocket.name}
+
                 <ChevronRightIcon
-                  data-selected={selectedPocket?.id === pocket.id}
+                  data-selected={selectedPocketId === pocket.id}
                   className="size-5 duration-200 group-hover:translate-x-1 data-[selected=true]:translate-x-1"
                 />
               </div>

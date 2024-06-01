@@ -5,8 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { PocketInformation } from './_components/pocket-information'
 import { PocketsList } from './_components/pockets-list'
-import { SymbolsList } from './_components/symbols-list'
 
 export default function Pockets() {
   return (
@@ -20,7 +20,7 @@ export default function Pockets() {
       </CardHeader>
       <CardContent className="flex gap-2">
         <PocketsList />
-        <SymbolsList />
+        <PocketInformation />
       </CardContent>
     </Card>
   )

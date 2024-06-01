@@ -14,7 +14,7 @@ type Props = {
   isTestnetAccount: boolean
   displayPwaButton: boolean
   pockets: Pocket[]
-  selectedPocket?: Pocket
+  selectedPocketId?: string
 }
 
 export const useAccountStore = create<Props>()(
@@ -37,7 +37,7 @@ export const useAccountStore = create<Props>()(
           symbols: ['LINKUSDT', 'ATOMUSDT'],
         },
       ],
-      selectedPocket: undefined,
+      selectedPocketId: undefined,
     }),
     {
       name: `${appStorageKey}:${storageKeys.account}`,
