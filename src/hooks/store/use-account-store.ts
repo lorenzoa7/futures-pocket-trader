@@ -25,18 +25,7 @@ export const useAccountStore = create<Props>()(
       secretKey: '',
       isTestnetAccount: false,
       displayPwaButton: true,
-      pockets: [
-        {
-          id: '08696eee-6de9-46c8-9e00-dc5e620bda9e',
-          name: 'Main',
-          symbols: ['ETHUSDT', 'BNBUSDT', 'ADAUSDT'],
-        },
-        {
-          id: 'd7490b3c-55ca-42e0-94cd-f20aff2296fb',
-          name: 'Test',
-          symbols: ['LINKUSDT', 'ATOMUSDT'],
-        },
-      ],
+      pockets: [],
       selectedPocketId: undefined,
     }),
     {
