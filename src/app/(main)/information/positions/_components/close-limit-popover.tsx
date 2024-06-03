@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -17,26 +17,26 @@ import Spinner from '@/components/ui/spinner'
 import { closeLimitQuantityPercentages } from '@/config/currency'
 import { roundToDecimals } from '@/functions/round-to-decimals'
 import { stopPropagate } from '@/functions/stop-propagate'
-import { useAccountStore } from '@/hooks/store/use-account-store'
-import {
-  SingleOrderSchema,
-  singleOrderSchema,
-} from '@/schemas/single-order-schema'
-import { trpc } from '@/server/client'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { SingleOrderSchema } from '@/schemas/single-order-schema'
+import { VariantProps } from 'class-variance-authority'
+import { useCloseLimitPopoverLogic } from '../_hooks/use-close-limit-popover-logic'
 
 type Props = {
+  triggerVariants: VariantProps<typeof buttonVariants>
+  triggerClassname: string
   quantity: number
   symbol: string
   side: 'LONG' | 'SHORT' | 'BOTH'
   isPending: boolean
   quantityPrecision: number
   handleSubmit: (data: SingleOrderSchema) => Promise<void>
+  triggerText?: string
 }
 
 export function CloseLimitPopover({
+  triggerClassname,
+  triggerText = 'Limit',
+  triggerVariants,
   quantity,
   symbol,
   side,
@@ -44,50 +44,23 @@ export function CloseLimitPopover({
   quantityPrecision,
   handleSubmit,
 }: Props) {
-  const { isTestnetAccount } = useAccountStore()
-  const [open, setOpen] = useState(false)
-  const { data: lastPrice, isPending: isPendingPrice } =
-    trpc.getSymbolPrice.useQuery({ symbol, isTestnetAccount })
-  const form = useForm<SingleOrderSchema>({
-    resolver: zodResolver(singleOrderSchema),
-    defaultValues: {
-      symbol,
-      price: 0,
+  const { form, isPendingPrice, open, setOpen, setValue } =
+    useCloseLimitPopoverLogic({
       quantity,
-      side: side === 'LONG' ? 'SELL' : 'BUY',
-      isUsdtQuantity: false,
-    },
-  })
-
-  const { setValue } = form
-
-  useEffect(() => {
-    if (lastPrice) {
-      setValue('price', lastPrice)
-    }
-  }, [open, lastPrice, setValue])
+      side,
+      symbol,
+    })
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild className="hidden lg:block">
+      <PopoverTrigger asChild>
         <Button
           type="button"
-          variant="link"
           disabled={isPending || isPendingPrice}
-          className="hidden h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500 lg:inline-flex"
+          className={triggerClassname}
+          {...triggerVariants}
         >
-          Limit
-        </Button>
-      </PopoverTrigger>
-      <PopoverTrigger asChild className="lg:hidden">
-        <Button
-          type="button"
-          size="sm"
-          variant="brand"
-          disabled={isPending || isPendingPrice}
-          className="text-xs sm:text-sm lg:hidden"
-        >
-          Close limit
+          {triggerText}
         </Button>
       </PopoverTrigger>
       <PopoverContent>

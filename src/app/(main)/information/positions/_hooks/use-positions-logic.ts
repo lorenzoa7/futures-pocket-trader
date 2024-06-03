@@ -42,7 +42,7 @@ export function usePositionsLogic() {
       onSuccess: async (_, variables) => {
         if (variables.shouldRefetch) {
           await Promise.all([
-            // TODO: invalidate get orders
+            trpcUtils.getOrders.invalidate(),
             trpcUtils.getPositions.invalidate(),
           ])
         }
@@ -55,6 +55,11 @@ export function usePositionsLogic() {
   })
   const [openCloseAllLimitPopover, setOpenCloseAllLimitPopover] =
     useState(false)
+
+  const [
+    openCloseAllLimitPopoverSmallScreen,
+    setOpenCloseAllLimitPopoverSmallScreen,
+  ] = useState(false)
 
   const filteredPositions = positions?.filter(
     (position) =>
@@ -237,14 +242,16 @@ export function usePositionsLogic() {
     try {
       await Promise.all(promises)
       await Promise.all([
-        // TODO: invalidate get orders
+        trpcUtils.getOrders.invalidate(),
         trpcUtils.getPositions.invalidate(),
       ])
 
       setOpenCloseAllLimitPopover(false)
+      setOpenCloseAllLimitPopoverSmallScreen(false)
       toast.success('Close all limit orders created successfully!')
     } catch (error) {
       setOpenCloseAllLimitPopover(false)
+      setOpenCloseAllLimitPopoverSmallScreen(false)
       toast.error("Couldn't create a new order.", {
         description: error as string,
       })
@@ -285,5 +292,7 @@ export function usePositionsLogic() {
     openPositionsSymbols,
     handleRefreshPositions,
     isFetchingPositions,
+    openCloseAllLimitPopoverSmallScreen,
+    setOpenCloseAllLimitPopoverSmallScreen,
   }
 }

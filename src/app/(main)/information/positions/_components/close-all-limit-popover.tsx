@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import {
   Popover,
@@ -7,19 +7,12 @@ import {
 } from '@/components/ui/popover'
 import Spinner from '@/components/ui/spinner'
 
-import {
-  CloseLimitQuantityPercentages,
-  closeLimitQuantityPercentages,
-} from '@/config/currency'
+import { closeLimitQuantityPercentages } from '@/config/currency'
 import { roundToDecimals } from '@/functions/round-to-decimals'
 import { stopPropagate } from '@/functions/stop-propagate'
-import {
-  CloseAllLimitSchema,
-  closeAllLimitSchema,
-} from '@/schemas/close-all-limit-schema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { CloseAllLimitSchema } from '@/schemas/close-all-limit-schema'
+import { VariantProps } from 'class-variance-authority'
+import { useCloseLimitAllPopoverLogic } from '../_hooks/use-close-all-limit-popover-logic'
 
 export type SymbolInformation = {
   quantity: number
@@ -30,65 +23,42 @@ export type SymbolInformation = {
 }
 
 type Props = {
+  triggerVariants: VariantProps<typeof buttonVariants>
+  triggerClassname: string
   symbolsInformation: SymbolInformation[]
   isPending: boolean
   handleSubmit: (data: CloseAllLimitSchema) => Promise<void>
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  triggerText?: string
 }
 
 export function CloseAllLimitPopover({
+  triggerClassname,
+  triggerVariants,
+  triggerText = 'Limit',
   symbolsInformation,
   isPending,
   handleSubmit,
   open,
   setOpen,
 }: Props) {
-  const [selectedPercentage, setSelectedPercentage] =
-    useState<CloseLimitQuantityPercentages>(100)
-
-  const form = useForm<CloseAllLimitSchema>({
-    resolver: zodResolver(closeAllLimitSchema),
-    defaultValues: {
-      orders: symbolsInformation.map((data) => ({
-        symbol: data.symbol,
-        price: data.price,
-        quantity: data.quantity,
-        side: data.side === 'LONG' ? 'SELL' : 'BUY',
-        isUsdtQuantity: false,
-      })),
-    },
-  })
-
-  const { setValue } = form
-
-  useEffect(() => {
-    setSelectedPercentage(100)
-  }, [open])
+  const { form, selectedPercentage, setSelectedPercentage, setValue } =
+    useCloseLimitAllPopoverLogic({ open, symbolsInformation })
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild className="hidden lg:block">
+      <PopoverTrigger asChild>
         <Button
           type="button"
-          variant="link"
           disabled={isPending}
-          className="hidden h-4 px-0 text-yellow-600 hover:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500 lg:inline-flex"
+          className={triggerClassname}
+          {...triggerVariants}
         >
-          Limit
+          {triggerText}
         </Button>
       </PopoverTrigger>
-      <PopoverTrigger asChild className="lg:hidden">
-        <Button
-          type="button"
-          size="sm"
-          variant="brand"
-          disabled={isPending}
-          className="flex-1 lg:hidden"
-        >
-          Close all (limit)
-        </Button>
-      </PopoverTrigger>
+
       <PopoverContent>
         <Form {...form}>
           <form
